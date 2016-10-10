@@ -119,12 +119,11 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.powermock/powermock-module-junit4-common -->
+		<!-- https://mvnrepository.com/artifact/org.powermock/powermock-module-junit4 -->
 		<dependency>
 			<groupId>org.powermock</groupId>
-			<artifactId>powermock-module-junit4-common</artifactId>
+			<artifactId>powermock-module-junit4</artifactId>
 			<version>1.6.5</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
