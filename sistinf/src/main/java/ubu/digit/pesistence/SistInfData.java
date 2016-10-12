@@ -18,6 +18,8 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import com.vaadin.server.VaadinService;
+
 import ubu.digit.util.ExternalProperties;
 
 /**
@@ -42,6 +44,11 @@ public class SistInfData {
     private Connection connection;
 
     /**
+     * Dirección de los ficheros en la aplicación del servidor.
+     */
+	private String serverPath = "";
+
+    /**
      * Instancia con los datos.
      */
     private static SistInfData instance;
@@ -55,7 +62,7 @@ public class SistInfData {
      * URL donde encontramos el fichero con las propiedades del proyecto.
      */
     private static ExternalProperties prop = ExternalProperties
-            .getInstance("./config.properties");
+    		.getInstance("/WEB-INF/classes/config.properties", false);
 
     /**
      * Directorio donde se encuentra los datos de entrada, es decir, los
@@ -91,9 +98,11 @@ public class SistInfData {
         Connection con = null;
         try {
             Class.forName("org.relique.jdbc.csv.CsvDriver");
+            if(DIRCSV.startsWith("/")) { 
+            	serverPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
+            }
 
-            con = DriverManager.getConnection(url + DIRCSV);
-
+            con = DriverManager.getConnection(url + serverPath + DIRCSV);
         } catch (ClassNotFoundException e) {
             LOGGER.error(e);
         } catch (SQLException e) {

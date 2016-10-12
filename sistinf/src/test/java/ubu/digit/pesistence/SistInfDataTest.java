@@ -42,7 +42,7 @@ public class SistInfDataTest {
      * URL del fichero donde se encuentra el fichero de configuración del test.
      */
     ExternalProperties test = ExternalProperties
-            .getInstance("./../src/test/testConfig.properties");
+    		.getInstance("src/test/resources/testConfig.properties", true);
 
     /**
      * Método que se ejecuta antes de cualquier test. Modifica el fichero de
@@ -52,7 +52,7 @@ public class SistInfDataTest {
     public void setUp() {
         mockStatic(ExternalProperties.class);
 
-        when(ExternalProperties.getInstance("./../src/main/config.properties"))
+        when(ExternalProperties.getInstance("/WEB-INF/classes/config.properties", false))
                 .thenReturn(test);
 
         sistInfData = SistInfData.getInstance();

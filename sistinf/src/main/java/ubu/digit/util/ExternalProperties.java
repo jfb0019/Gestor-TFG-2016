@@ -7,6 +7,8 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
+import com.vaadin.server.VaadinService;
+
 /**
  * Clase para la obtención de los valores de las propiedades.
  * 
@@ -36,6 +38,11 @@ public class ExternalProperties {
     private static ExternalProperties instance;
 
     /**
+     * Dirección de los ficheros en la aplicación del servidor.
+     */
+	private static String basePath = "";
+
+    /**
      * Constructor.
      */
     private ExternalProperties() {
@@ -49,17 +56,34 @@ public class ExternalProperties {
         }
     }
 
-    /**
-     * Método singleton para obtener la instancia de la clase fachada.
-     */
-    public static ExternalProperties getInstance(String propFileName) {
+	/**
+	 * Método singleton para obtener la instancia del fichero de propiedades.
+	 * 
+	 * @param propFileName
+	 *            nombre del fichero
+	 * @param testFlag
+	 *            bandera para diferenciar los ficheros de propiedades de test y
+	 *            ejecución (true: test, false: no test)
+	 * @return
+	 */
+    public static ExternalProperties getInstance(String propFileName, Boolean testFlag) { 
+    	if(!testFlag) {
+    		basePath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
+    	}
+    	
         if (instance == null) {
-            FILE = propFileName;
+            FILE = basePath + propFileName;
             instance = new ExternalProperties();
         }
         return instance;
     }
-
+    
+    // Nomenclatura de la función original para que no de error de compilación
+    // TODO Quitar cuando no se necesiten los fuentes de htmlgen y util
+    public static ExternalProperties getInstance(String propFileName) {
+    	return null;
+    }
+    
     /**
      * Método que obtiene el valor de la propiedad que se pasa.
      * 
