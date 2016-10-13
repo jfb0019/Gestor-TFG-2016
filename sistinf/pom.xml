@@ -23,6 +23,9 @@
 		<!-- If there are no local customisations, this can also be "fetch" or 
 			"cdn" -->
 		<vaadin.widgetset.mode>local</vaadin.widgetset.mode>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	  	<sonar.junit.reportsPath>target/surefire-reports</sonar.junit.reportsPath>
+	  	<sonar.cobertura.reportPath>target/site/cobertura/coverage.xml</sonar.cobertura.reportPath>
 	</properties>
 
 	<repositories>
@@ -191,6 +194,7 @@
 				<configuration>
 					<formats>
 						<format>html</format>
+						<format>xml</format>
 					</formats>
 					<instrumentation>
 						<ignoreTrivial>true</ignoreTrivial>
