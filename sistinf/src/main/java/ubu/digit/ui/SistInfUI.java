@@ -1,5 +1,6 @@
 package ubu.digit.ui;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -43,13 +44,21 @@ public class SistInfUI extends UI {
 			while (result.next()) {
 				String cargo = result.getString("Cargo");
 				String nombre = result.getString("NombreApellidos");
-				layout.addComponent(new Label(cargo + ": " + nombre));
-			} // while
+				byte[] bytesCargo = cargo.getBytes("Windows-1252");
+				byte[] bytesNombre = nombre.getBytes("Windows-1252");
+				String cargoUTF8 = new String(bytesCargo, "UTF-8");
+				String nombreUTF8 = new String(bytesNombre, "UTF-8");
+				String tribunal = new String(cargoUTF8 + ": " + nombreUTF8);
+				layout.addComponent(new Label(tribunal));
+			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		
+
 		layout.setMargin(true);
 		layout.setSpacing(true);
 		setContent(layout);
