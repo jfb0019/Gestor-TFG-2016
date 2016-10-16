@@ -29,9 +29,9 @@ import ubu.digit.pesistence.SistInfData;
 @Theme("sistinftheme")
 public class SistInfUI extends UI {
 
-	 /**
-     * Logger de la clase.
-     */
+	/**
+	 * Logger de la clase.
+	 */
 	private static final Logger LOGGER = Logger.getLogger(SistInfData.class);
 
 	/**
@@ -50,7 +50,7 @@ public class SistInfUI extends UI {
 			while (result.next()) {
 				String cargo = result.getString("Cargo");
 				String nombre = result.getString("NombreApellidos");
-				String tribunal = new String(cargo + ": " + nombre);
+				String tribunal = cargo + ": " + nombre;
 				layout.addComponent(new Label(tribunal));
 			}
 		} catch (SQLException e) {
