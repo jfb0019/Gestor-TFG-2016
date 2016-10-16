@@ -45,18 +45,17 @@ public class SistInfUI extends UI {
 		SistInfData fachadaDatos = SistInfData.getInstance();
 
 		layout.addComponent(new Label("Tribunal:"));
-		try {
-			ResultSet result = fachadaDatos.getResultSet("Tribunal", "NombreApellidos");
+		try (ResultSet result = fachadaDatos.getResultSet("Tribunal", "NombreApellidos")){
 			while (result.next()) {
 				String cargo = result.getString("Cargo");
 				String nombre = result.getString("NombreApellidos");
 				String tribunal = cargo + ": " + nombre;
 				layout.addComponent(new Label(tribunal));
-			}
+			}		
 		} catch (SQLException e) {
 			LOGGER.error(e);
 		}
-
+		
 		layout.setMargin(true);
 		layout.setSpacing(true);
 		setContent(layout);
