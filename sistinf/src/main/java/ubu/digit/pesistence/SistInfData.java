@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -101,8 +102,9 @@ public class SistInfData {
             if(DIRCSV.startsWith("/")) { 
             	serverPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
             }
-
-            con = DriverManager.getConnection(url + serverPath + DIRCSV);
+            Properties props = new java.util.Properties();
+            props.put("charset", "UTF-8");
+            con = DriverManager.getConnection(url + serverPath + DIRCSV, props);
         } catch (ClassNotFoundException e) {
             LOGGER.error(e);
         } catch (SQLException e) {

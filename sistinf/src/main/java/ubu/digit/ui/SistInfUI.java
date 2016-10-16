@@ -1,10 +1,11 @@
 package ubu.digit.ui;
 
-import java.io.UnsupportedEncodingException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.servlet.annotation.WebServlet;
+
+import org.apache.log4j.Logger;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
@@ -28,6 +29,11 @@ import ubu.digit.pesistence.SistInfData;
 @Theme("sistinftheme")
 public class SistInfUI extends UI {
 
+	 /**
+     * Logger de la clase.
+     */
+	private static final Logger LOGGER = Logger.getLogger(SistInfData.class);
+
 	/**
 	 * 
 	 */
@@ -44,19 +50,11 @@ public class SistInfUI extends UI {
 			while (result.next()) {
 				String cargo = result.getString("Cargo");
 				String nombre = result.getString("NombreApellidos");
-				byte[] bytesCargo = cargo.getBytes("Windows-1252");
-				byte[] bytesNombre = nombre.getBytes("Windows-1252");
-				String cargoUTF8 = new String(bytesCargo, "UTF-8");
-				String nombreUTF8 = new String(bytesNombre, "UTF-8");
-				String tribunal = new String(cargoUTF8 + ": " + nombreUTF8);
+				String tribunal = new String(cargo + ": " + nombre);
 				layout.addComponent(new Label(tribunal));
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error(e);
 		}
 
 		layout.setMargin(true);
