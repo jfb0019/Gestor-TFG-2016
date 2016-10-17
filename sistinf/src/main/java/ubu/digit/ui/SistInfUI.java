@@ -9,9 +9,13 @@ import org.apache.log4j.Logger;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.server.ExternalResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Link;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
@@ -53,7 +57,38 @@ public class SistInfUI extends UI {
 				layout.addComponent(new Label(tribunal));
 			}		
 		} catch (SQLException e) {
-			LOGGER.error(e);
+			LOGGER.error("Error en tribunal", e);
+		}
+		layout.addComponent(new Label("Programa en vigor a partir del Curso 2002-2003."));
+
+		layout.addComponent(new Label("&nbsp;", ContentMode.HTML));
+		layout.addComponent(new Label("Especificaciones de Entrega:"));
+		try (ResultSet result = fachadaDatos.getResultSet("Norma", "Descripcion")){
+			while (result.next()) {
+				String descripcion = result.getString("Descripcion");
+				layout.addComponent(new Label(descripcion));
+			}		
+		} catch (SQLException e) {
+			LOGGER.error("Error en normas", e);
+		}
+		
+		layout.addComponent(new Label("&nbsp;", ContentMode.HTML));
+		layout.addComponent(new Label("Fechas de entrega:"));
+		BrowserFrame calendar = new BrowserFrame("", new ExternalResource("https://goo.gl/PgEkF1"));
+		calendar.setWidth(100, Unit.PERCENTAGE);
+		calendar.setHeight(500, Unit.PIXELS);
+		layout.addComponent(calendar);
+
+		layout.addComponent(new Label("&nbsp;", ContentMode.HTML));
+		layout.addComponent(new Label("Documentos:"));
+		try (ResultSet result = fachadaDatos.getResultSet("Documento", "Descripcion")){
+			while (result.next()) {
+				String descripcion = result.getString("Descripcion");
+				String url = result.getString("Url");
+				layout.addComponent(new Link(descripcion, new ExternalResource(url)));
+			}		
+		} catch (SQLException e) {
+			LOGGER.error("Error en documentos", e);
 		}
 		
 		layout.setMargin(true);
