@@ -35,4 +35,16 @@
   @include valo;
 
   // Insert your own theme rules here
+  	.lbl-title {
+  		font-size: 3em;
+  		font-weight: bold;
+   	}
+   	
+   	.icon-big {
+   		font-size: 6.6em;
+   	}
+   	
+   	 .v-horizontallayout > .v-spacing {
+    	width: 20px;
+	}
 }

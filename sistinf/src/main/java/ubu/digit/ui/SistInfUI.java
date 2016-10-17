@@ -10,10 +10,14 @@ import org.apache.log4j.Logger;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.ExternalResource;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.BrowserFrame;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.UI;
@@ -45,55 +49,99 @@ public class SistInfUI extends UI {
 
 	@Override
 	protected void init(VaadinRequest vaadinRequest) {
-		final VerticalLayout layout = new VerticalLayout();
 		SistInfData fachadaDatos = SistInfData.getInstance();
+		
+		Page.getCurrent().setTitle("Sistemas Informáticos - Información");
+		
+		final VerticalLayout content = new VerticalLayout();
+		content.setMargin(true);
+		content.setSpacing(true);
 
-		layout.addComponent(new Label("Tribunal:"));
-		try (ResultSet result = fachadaDatos.getResultSet("Tribunal", "NombreApellidos")){
+		// TRIBUNAL
+		Label tribunalTitle = new Label("Tribunal");
+		tribunalTitle.setStyleName("lbl-title");
+		content.addComponent(tribunalTitle);
+		
+		final HorizontalLayout horizontalTribunal = new HorizontalLayout();
+		horizontalTribunal.setSpacing(true);
+		horizontalTribunal.setMargin(new MarginInfo(false, true, false, true));
+		
+		Label iconoTribunal = new Label(FontAwesome.USERS.getHtml(),ContentMode.HTML);
+		iconoTribunal.setStyleName("icon-big");
+		iconoTribunal.setWidth(130, Unit.PIXELS);
+		
+		final VerticalLayout tribunal = new VerticalLayout();
+		tribunal.setSpacing(true);
+		tribunal.setWidth(350, Unit.PIXELS);
+		
+		try (ResultSet result = fachadaDatos.getResultSet("Tribunal", "NombreApellidos")) {
 			while (result.next()) {
 				String cargo = result.getString("Cargo");
 				String nombre = result.getString("NombreApellidos");
-				String tribunal = cargo + ": " + nombre;
-				layout.addComponent(new Label(tribunal));
-			}		
+				String filaTribunal = cargo + ": " + nombre;
+				tribunal.addComponent(new Label(filaTribunal));
+			}
 		} catch (SQLException e) {
 			LOGGER.error("Error en tribunal", e);
 		}
-		layout.addComponent(new Label("Programa en vigor a partir del Curso 2002-2003."));
+		horizontalTribunal.addComponent(iconoTribunal);
+		horizontalTribunal.addComponent(tribunal);
+		content.addComponent(horizontalTribunal);
+		content.addComponent(new Label("Programa en vigor a partir del Curso 2002-2003."));
 
-		layout.addComponent(new Label("&nbsp;", ContentMode.HTML));
-		layout.addComponent(new Label("Especificaciones de Entrega:"));
-		try (ResultSet result = fachadaDatos.getResultSet("Norma", "Descripcion")){
+		// NORMAS
+		content.addComponent(new Label("&nbsp;", ContentMode.HTML));
+		Label normasTitle = new Label("Especificaciones de Entrega");
+		normasTitle.setStyleName("lbl-title");
+		content.addComponent(normasTitle);
+		
+		final VerticalLayout normas = new VerticalLayout();
+		normas.setSpacing(true);
+		
+		try (ResultSet result = fachadaDatos.getResultSet("Norma", "Descripcion")) {
 			while (result.next()) {
 				String descripcion = result.getString("Descripcion");
-				layout.addComponent(new Label(descripcion));
-			}		
+				normas.addComponent(new Label(" - " + descripcion));
+			}
 		} catch (SQLException e) {
 			LOGGER.error("Error en normas", e);
 		}
+		content.addComponent(normas);
 		
-		layout.addComponent(new Label("&nbsp;", ContentMode.HTML));
-		layout.addComponent(new Label("Fechas de entrega:"));
+		// FECHAS
+		content.addComponent(new Label("&nbsp;", ContentMode.HTML));
+		Label fechasTitle = new Label("Fechas de entrega");
+		fechasTitle.setStyleName("lbl-title");
+		content.addComponent(fechasTitle);
+		
 		BrowserFrame calendar = new BrowserFrame("", new ExternalResource("https://goo.gl/PgEkF1"));
 		calendar.setWidth(100, Unit.PERCENTAGE);
 		calendar.setHeight(500, Unit.PIXELS);
-		layout.addComponent(calendar);
-
-		layout.addComponent(new Label("&nbsp;", ContentMode.HTML));
-		layout.addComponent(new Label("Documentos:"));
-		try (ResultSet result = fachadaDatos.getResultSet("Documento", "Descripcion")){
+		content.addComponent(calendar);
+		
+		// DOCUMENTOS
+		content.addComponent(new Label("&nbsp;", ContentMode.HTML));
+		Label documentosTitle = new Label("Documentos");
+		documentosTitle.setStyleName("lbl-title");
+		content.addComponent(documentosTitle);
+		
+		final VerticalLayout documentos = new VerticalLayout();
+		documentos.setSpacing(true);
+		
+		try (ResultSet result = fachadaDatos.getResultSet("Documento", "Descripcion")) {
 			while (result.next()) {
 				String descripcion = result.getString("Descripcion");
 				String url = result.getString("Url");
-				layout.addComponent(new Link(descripcion, new ExternalResource(url)));
-			}		
+				Link link = new Link(descripcion, new ExternalResource(url));
+				link.setIcon(FontAwesome.LINK);
+				documentos.addComponent(link);
+			}
 		} catch (SQLException e) {
 			LOGGER.error("Error en documentos", e);
 		}
+		content.addComponent(documentos);
 		
-		layout.setMargin(true);
-		layout.setSpacing(true);
-		setContent(layout);
+		setContent(content);
 	}
 
 	@WebServlet(urlPatterns = "/*", name = "SistInfUIServlet", asyncSupported = true)
