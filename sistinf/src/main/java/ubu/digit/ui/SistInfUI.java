@@ -24,6 +24,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import ubu.digit.pesistence.SistInfData;
+import ubu.digit.util.ExternalProperties;
 
 /**
  * This UI is the application entry point. A UI may either represent a browser
@@ -50,30 +51,33 @@ public class SistInfUI extends UI {
 	@Override
 	protected void init(VaadinRequest vaadinRequest) {
 		SistInfData fachadaDatos = SistInfData.getInstance();
-		
+		ExternalProperties config = ExternalProperties.getInstance("/WEB-INF/classes/config.properties", false);
+		String estiloTitulo = "lbl-title";
+		String lineaBlanco = "&nbsp;";
 		Page.getCurrent().setTitle("Sistemas Informáticos - Información");
-		
+
 		final VerticalLayout content = new VerticalLayout();
 		content.setMargin(true);
 		content.setSpacing(true);
-
+		
+		
 		// TRIBUNAL
 		Label tribunalTitle = new Label("Tribunal");
-		tribunalTitle.setStyleName("lbl-title");
+		tribunalTitle.setStyleName(estiloTitulo);
 		content.addComponent(tribunalTitle);
-		
+
 		final HorizontalLayout horizontalTribunal = new HorizontalLayout();
 		horizontalTribunal.setSpacing(true);
 		horizontalTribunal.setMargin(new MarginInfo(false, true, false, true));
-		
-		Label iconoTribunal = new Label(FontAwesome.USERS.getHtml(),ContentMode.HTML);
+
+		Label iconoTribunal = new Label(FontAwesome.USERS.getHtml(), ContentMode.HTML);
 		iconoTribunal.setStyleName("icon-big");
 		iconoTribunal.setWidth(130, Unit.PIXELS);
-		
+
 		final VerticalLayout tribunal = new VerticalLayout();
 		tribunal.setSpacing(true);
 		tribunal.setWidth(350, Unit.PIXELS);
-		
+
 		try (ResultSet result = fachadaDatos.getResultSet("Tribunal", "NombreApellidos")) {
 			while (result.next()) {
 				String cargo = result.getString("Cargo");
@@ -87,17 +91,20 @@ public class SistInfUI extends UI {
 		horizontalTribunal.addComponent(iconoTribunal);
 		horizontalTribunal.addComponent(tribunal);
 		content.addComponent(horizontalTribunal);
-		content.addComponent(new Label("Programa en vigor a partir del Curso 2002-2003."));
+		String indexAño = config.getSetting("indexAño");
+		int indexAñoSiguiente = Integer.parseInt(indexAño) + 1;
+		Label curso = new Label("Programa en vigor a partir del Curso " + indexAño + "-" + indexAñoSiguiente + ".");
+		content.addComponent(curso);
 
 		// NORMAS
-		content.addComponent(new Label("&nbsp;", ContentMode.HTML));
+		content.addComponent(new Label(lineaBlanco, ContentMode.HTML));
 		Label normasTitle = new Label("Especificaciones de Entrega");
-		normasTitle.setStyleName("lbl-title");
+		normasTitle.setStyleName(estiloTitulo);
 		content.addComponent(normasTitle);
-		
+
 		final VerticalLayout normas = new VerticalLayout();
 		normas.setSpacing(true);
-		
+
 		try (ResultSet result = fachadaDatos.getResultSet("Norma", "Descripcion")) {
 			while (result.next()) {
 				String descripcion = result.getString("Descripcion");
@@ -107,27 +114,28 @@ public class SistInfUI extends UI {
 			LOGGER.error("Error en normas", e);
 		}
 		content.addComponent(normas);
-		
+
 		// FECHAS
-		content.addComponent(new Label("&nbsp;", ContentMode.HTML));
+		content.addComponent(new Label(lineaBlanco, ContentMode.HTML));
 		Label fechasTitle = new Label("Fechas de entrega");
-		fechasTitle.setStyleName("lbl-title");
+		fechasTitle.setStyleName(estiloTitulo);
 		content.addComponent(fechasTitle);
-		
-		BrowserFrame calendar = new BrowserFrame("", new ExternalResource("https://goo.gl/PgEkF1"));
-		calendar.setWidth(100, Unit.PERCENTAGE);
+
+		String urlCalendario = config.getSetting("urlCalendario");
+		BrowserFrame calendar = new BrowserFrame("", new ExternalResource("https://" + urlCalendario));
+		calendar.setWidth(85, Unit.PERCENTAGE);
 		calendar.setHeight(500, Unit.PIXELS);
 		content.addComponent(calendar);
-		
+
 		// DOCUMENTOS
-		content.addComponent(new Label("&nbsp;", ContentMode.HTML));
+		content.addComponent(new Label(lineaBlanco, ContentMode.HTML));
 		Label documentosTitle = new Label("Documentos");
-		documentosTitle.setStyleName("lbl-title");
+		documentosTitle.setStyleName(estiloTitulo);
 		content.addComponent(documentosTitle);
-		
+
 		final VerticalLayout documentos = new VerticalLayout();
 		documentos.setSpacing(true);
-		
+
 		try (ResultSet result = fachadaDatos.getResultSet("Documento", "Descripcion")) {
 			while (result.next()) {
 				String descripcion = result.getString("Descripcion");
@@ -140,7 +148,7 @@ public class SistInfUI extends UI {
 			LOGGER.error("Error en documentos", e);
 		}
 		content.addComponent(documentos);
-		
+
 		setContent(content);
 	}
 
