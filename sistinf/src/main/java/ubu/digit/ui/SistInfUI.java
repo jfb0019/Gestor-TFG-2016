@@ -59,12 +59,10 @@ public class SistInfUI extends UI {
 		final VerticalLayout content = new VerticalLayout();
 		content.setMargin(true);
 		content.setSpacing(true);
-		
-		
+
 		// TRIBUNAL
 		Label tribunalTitle = new Label("Tribunal");
 		tribunalTitle.setStyleName(estiloTitulo);
-		content.addComponent(tribunalTitle);
 
 		final HorizontalLayout horizontalTribunal = new HorizontalLayout();
 		horizontalTribunal.setSpacing(true);
@@ -88,19 +86,17 @@ public class SistInfUI extends UI {
 		} catch (SQLException e) {
 			LOGGER.error("Error en tribunal", e);
 		}
-		horizontalTribunal.addComponent(iconoTribunal);
-		horizontalTribunal.addComponent(tribunal);
-		content.addComponent(horizontalTribunal);
+		horizontalTribunal.addComponents(iconoTribunal, tribunal);
+
 		String indexAño = config.getSetting("indexAño");
 		int indexAñoSiguiente = Integer.parseInt(indexAño) + 1;
 		Label curso = new Label("Programa en vigor a partir del Curso " + indexAño + "-" + indexAñoSiguiente + ".");
-		content.addComponent(curso);
+		content.addComponents(tribunalTitle, horizontalTribunal, curso);
 
 		// NORMAS
 		content.addComponent(new Label(lineaBlanco, ContentMode.HTML));
 		Label normasTitle = new Label("Especificaciones de Entrega");
 		normasTitle.setStyleName(estiloTitulo);
-		content.addComponent(normasTitle);
 
 		final VerticalLayout normas = new VerticalLayout();
 		normas.setSpacing(true);
@@ -113,25 +109,23 @@ public class SistInfUI extends UI {
 		} catch (SQLException e) {
 			LOGGER.error("Error en normas", e);
 		}
-		content.addComponent(normas);
+		content.addComponents(normasTitle, normas);
 
 		// FECHAS
 		content.addComponent(new Label(lineaBlanco, ContentMode.HTML));
 		Label fechasTitle = new Label("Fechas de entrega");
 		fechasTitle.setStyleName(estiloTitulo);
-		content.addComponent(fechasTitle);
 
 		String urlCalendario = config.getSetting("urlCalendario");
 		BrowserFrame calendar = new BrowserFrame("", new ExternalResource("https://" + urlCalendario));
 		calendar.setWidth(85, Unit.PERCENTAGE);
 		calendar.setHeight(500, Unit.PIXELS);
-		content.addComponent(calendar);
+		content.addComponents(fechasTitle, calendar);
 
 		// DOCUMENTOS
 		content.addComponent(new Label(lineaBlanco, ContentMode.HTML));
 		Label documentosTitle = new Label("Documentos");
 		documentosTitle.setStyleName(estiloTitulo);
-		content.addComponent(documentosTitle);
 
 		final VerticalLayout documentos = new VerticalLayout();
 		documentos.setSpacing(true);
@@ -147,7 +141,7 @@ public class SistInfUI extends UI {
 		} catch (SQLException e) {
 			LOGGER.error("Error en documentos", e);
 		}
-		content.addComponent(documentos);
+		content.addComponents(documentosTitle, documentos);
 
 		setContent(content);
 	}
