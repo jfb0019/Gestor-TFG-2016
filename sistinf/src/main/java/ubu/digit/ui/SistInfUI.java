@@ -24,6 +24,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import ubu.digit.pesistence.SistInfData;
+import ubu.digit.ui.components.NavigationBar;
 import ubu.digit.util.ExternalProperties;
 
 /**
@@ -59,6 +60,9 @@ public class SistInfUI extends UI {
 		final VerticalLayout content = new VerticalLayout();
 		content.setMargin(true);
 		content.setSpacing(true);
+		
+		NavigationBar navBar = new NavigationBar();
+		content.addComponent(navBar);
 
 		// TRIBUNAL
 		Label tribunalTitle = new Label("Tribunal");

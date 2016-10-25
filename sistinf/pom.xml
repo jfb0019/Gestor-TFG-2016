@@ -26,6 +26,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	  	<sonar.junit.reportsPath>target/surefire-reports</sonar.junit.reportsPath>
 	  	<sonar.cobertura.reportPath>target/site/cobertura/coverage.xml</sonar.cobertura.reportPath>
+	  	<sonar.host.url>http://prueba-ubugii.rhcloud.com/</sonar.host.url>
 	</properties>
 
 	<repositories>
@@ -201,9 +202,9 @@
 						<ignores>
 							<ignore>org.apache.log4j.Logger.*</ignore>
 						</ignores>
-						<excludes>
+						<!-- <excludes>
 							<exclude>**/SistInfUI.class</exclude>
-						</excludes>
+						</excludes>  -->
 					</instrumentation>
 				</configuration>
 				<executions>
