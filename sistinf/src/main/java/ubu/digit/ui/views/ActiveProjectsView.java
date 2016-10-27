@@ -11,7 +11,7 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 
 	private static final long serialVersionUID = 8857805864102975132L;
 
-	public static String VIEW_NAME = "active-projects";
+	public static final String VIEW_NAME = "active-projects";
 
 	public ActiveProjectsView() {
 		setMargin(true);

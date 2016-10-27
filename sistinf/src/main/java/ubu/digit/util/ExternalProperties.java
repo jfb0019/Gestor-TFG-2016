@@ -3,6 +3,7 @@ package ubu.digit.util;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -15,9 +16,11 @@ import com.vaadin.server.VaadinService;
  * @author Beatriz Zurera Martínez-Acitores.
  * @since 3.0
  */
-public class ExternalProperties {
+public class ExternalProperties implements Serializable {
 
-    /**
+	private static final long serialVersionUID = 3667519929144990872L;
+
+	/**
      * Logger de la clase.
      */
     private static final Logger LOGGER = Logger.getLogger(ExternalProperties.class);
@@ -30,7 +33,7 @@ public class ExternalProperties {
     /**
      * Fichero del que leeremos las propiedades.
      */
-    private static String FILE;
+    private static String file;
 
     /**
      * Instancia que tendrá la propiedad.
@@ -49,7 +52,7 @@ public class ExternalProperties {
 
         InputStream inputStream = null;
         try {
-            inputStream = new FileInputStream(FILE);
+            inputStream = new FileInputStream(file);
             PROPERTIES.load(inputStream);
         } catch (IOException e) {
             LOGGER.error("", e);
@@ -72,7 +75,7 @@ public class ExternalProperties {
     	}
     	
         if (instance == null) {
-            FILE = basePath + propFileName;
+            file = basePath + propFileName;
             instance = new ExternalProperties();
         }
         return instance;

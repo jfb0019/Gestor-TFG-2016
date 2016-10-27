@@ -39,7 +39,7 @@ public class InformationView extends VerticalLayout implements View {
 
 	private String lineaBlanco;
 	
-	public static String VIEW_NAME = "information";
+	public static final String VIEW_NAME = "information";
 
 	public InformationView() {
 		fachadaDatos = SistInfData.getInstance();

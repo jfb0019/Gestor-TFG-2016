@@ -1,5 +1,6 @@
 package ubu.digit.pesistence;
 
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -32,9 +33,21 @@ import ubu.digit.util.ExternalProperties;
  * @author Beatriz Zurera Martínez-Acitores
  * @since 0.5
  */
-public class SistInfData {
+public class SistInfData implements Serializable {
 
-    /**
+	private static final long serialVersionUID = -7003492582982197711L;
+
+	private static final String SELECT_ALL = "Select * ";
+
+	private static final String DISTINTO_DE_VACIO = " != '';";
+
+	private static final String WHERE = " where ";
+
+	private static final String FROM = " from ";
+
+	private static final String SELECT = "Select ";
+
+	/**
      * Logger de la clase.
      */
     private static final Logger LOGGER = Logger.getLogger(SistInfData.class);
@@ -105,9 +118,7 @@ public class SistInfData {
             Properties props = new java.util.Properties();
             props.put("charset", "UTF-8");
             con = DriverManager.getConnection(url + serverPath + DIRCSV, props);
-        } catch (ClassNotFoundException e) {
-            LOGGER.error(e);
-        } catch (SQLException e) {
+		} catch (ClassNotFoundException | SQLException e) {
             LOGGER.error(e);
         }
         return con;
@@ -137,6 +148,7 @@ public class SistInfData {
                     number = result.getFloat(1);
                 }
                 result.close();
+                statement.close();
             }
         } catch (SQLException e) {
             LOGGER.error(e);
@@ -231,13 +243,13 @@ public class SistInfData {
     private List<Float> obtenerDatos(String columnName, String tableName)
             throws SQLException {
         Statement statement = connection.createStatement();
-        String sql = "Select " + columnName + " from " + tableName + ";";
+        String sql = SELECT + columnName + FROM + tableName + ";";
         ResultSet result = statement.executeQuery(sql);
 
         // Capturamos los metadatos de la tabla
         ResultSetMetaData rmeta = result.getMetaData();
         int numColumns = rmeta.getColumnCount();
-        List<Float> media = new ArrayList<Float>();
+        List<Float> media = new ArrayList<>();
         // Recorremos las filas del cursor
         while (result.next()) {
             for (int i = 1; i <= numColumns; ++i) {
@@ -245,6 +257,7 @@ public class SistInfData {
             }
         } // while
         result.close();
+        statement.close();
         return media;
     }
 
@@ -294,30 +307,31 @@ public class SistInfData {
         return Math.sqrt(result);
     }
 
-    /**
-     * Ejecuta una sentencia SQL obteniendo la mediana de la columna de una
-     * tabla, ambas pasadas como parámetro.
-     * 
-     * @param columnName
-     *            nombre de la columna
-     * @param tableName
-     *            nombre de la tabla de datos
-     * @return mediana
-     * @throws SQLException
-     * @throws SQLException
-     */
-    public Number getQuartilColumn(String columnName, String tableName,
+	/**
+	 * Ejecuta una sentencia SQL obteniendo la mediana de la columna de una
+	 * tabla, ambas pasadas como parámetro.
+	 * 
+	 * @param columnName
+	 *            nombre de la columna
+	 * @param tableName
+	 *            nombre de la tabla de datos
+	 * @param percent
+	 *            cuartil
+	 * @return mediana
+	 * @throws SQLException
+	 * @throws SQLException
+	 */
+	public Number getQuartilColumn(String columnName, String tableName,
             double percent) throws SQLException {
 
         Number nTotalValue = getTotalNumber(columnName, tableName);
 
-        String sql = "Select " + columnName + " from " + tableName + " where "
+        String sql = SELECT + columnName + FROM + tableName + WHERE
                 + columnName + "!= ''" + " order by " + columnName;
 
         List<Double> listValues = getListNumber(columnName, sql);
 
-        int indexMedian = new Double(nTotalValue.intValue() * percent)
-                .intValue();
+        int indexMedian = (int) (nTotalValue.intValue() * percent);
 
         return listValues.get(indexMedian);
     }
@@ -332,7 +346,7 @@ public class SistInfData {
      */
     private List<Double> getListNumber(String columnName, String sql)
             throws SQLException {
-        List<Double> listValues = new ArrayList<Double>(100);
+        List<Double> listValues = new ArrayList<>(100);
 
         Statement statement = connection.createStatement();
         Boolean hasResults = statement.execute(sql);
@@ -344,6 +358,7 @@ public class SistInfData {
                 listValues.add(result.getDouble(columnName));
             }
             result.close();
+            statement.close();
         }
         return listValues;
     }
@@ -363,7 +378,7 @@ public class SistInfData {
             throws SQLException {
 
         String sql = "Select distinct count(" + columnName + ")" + "from "
-                + tableName + " where " + columnName + " != '';";
+                + tableName + WHERE + columnName + DISTINTO_DE_VACIO;
 
         return getResultSetNumber(sql);
     }
@@ -384,8 +399,8 @@ public class SistInfData {
     public Number getTotalNumber(String columnName, String tableName,
             String whereCondition) throws SQLException {
 
-        String sql = "Select distinct count(" + columnName + ")" + " from "
-                + tableName + " where " + columnName + " != '' AND "
+        String sql = "Select distinct count(" + columnName + ")" + FROM
+                + tableName + WHERE + columnName + " != '' AND "
                 + whereCondition + " ;";
 
         return getResultSetNumber(sql);
@@ -404,15 +419,17 @@ public class SistInfData {
      */
     public Number getTotalNumber(String[] columnsName, String tableName)
             throws SQLException {
-        String sql = null;
-        Set<String> noDups = new HashSet<String>();
+        String sql;
+        Statement statement = null;
+        ResultSet results = null;
+        Set<String> noDups = new HashSet<>();
         if (columnsName != null) {
 
             for (int i = 0; i < columnsName.length; i++) {
-                sql = "Select " + columnsName[i] + " from " + tableName
-                        + " where " + columnsName[i] + " != '';";
-                Statement statement = connection.createStatement();
-                ResultSet results = statement.executeQuery(sql);
+                sql = SELECT + columnsName[i] + FROM + tableName
+                        + WHERE + columnsName[i] + DISTINTO_DE_VACIO;
+				statement = connection.createStatement();
+				results = statement.executeQuery(sql);
 
                 ResultSetMetaData rmeta = results.getMetaData();
                 int numColumns = rmeta.getColumnCount();
@@ -423,7 +440,8 @@ public class SistInfData {
                     }
                 } // while
             }
-
+            results.close();
+            statement.close();
             return (float) noDups.size();
         } else {
             return 0;
@@ -458,10 +476,12 @@ public class SistInfData {
     public ResultSet getResultSet(String tableName, String columnName)
             throws SQLException {
         Statement statement = connection.createStatement();
-        String sql = "Select * " + " from " + tableName + " where "
-                + columnName + " != '';";
-
-        return statement.executeQuery(sql);
+        String sql = SELECT_ALL + FROM + tableName + WHERE
+                + columnName + DISTINTO_DE_VACIO;
+        
+         ResultSet resultSet = statement.executeQuery(sql);
+         statement.close();
+         return resultSet;
     }
 
     /**
@@ -481,10 +501,12 @@ public class SistInfData {
     public ResultSet getResultSet(String tableName, String columnName,
             String whereCondition) throws SQLException {
         Statement statement = connection.createStatement();
-        String sql = "Select * " + " from " + tableName + " WHERE "
+        String sql = SELECT_ALL + FROM + tableName + " WHERE "
                 + whereCondition + ";";
         statement.execute(sql);
-        return statement.getResultSet();
+        ResultSet resultSet = statement.getResultSet();
+        statement.close();
+        return resultSet;
     }
 
     /**
@@ -506,38 +528,40 @@ public class SistInfData {
     public ResultSet getResultSet(String tableName, String columnName,
             String[] filters, String[] columnsName) throws SQLException {
         Statement statement = connection.createStatement();
-        String sql;
+        StringBuilder sqlSB = new StringBuilder();
         if (columnsName == null) {
-            sql = "Select * ";
+            sqlSB.append(SELECT_ALL);
         } else {
-            sql = "Select ";
+            sqlSB.append(SELECT);
             int index = 0;
             for (String selectedColumn : columnsName) {
                 if (index == 0) {
-                    sql += " " + selectedColumn;
+                    sqlSB.append(" " + selectedColumn);
                     index++;
                 } else {
-                    sql += ", " + selectedColumn;
+                    sqlSB.append(", " + selectedColumn);
                 }
             }
         }
-        sql += " \nfrom " + tableName + " \nwhere (" + columnName + " != '') ";
+        sqlSB.append(" \nfrom " + tableName + " \nwhere (" + columnName + " != '') ");
         if (filters != null) {
-            sql += "AND (";
+            sqlSB.append("AND (");
             int index = 0;
             for (String filter : filters) {
                 if (index == 0) {
-                    sql += " \n" + columnName + " = '" + filter + "'";
+                    sqlSB.append(" \n" + columnName + " = '" + filter + "'");
                     index++;
                 } else {
-                    sql += " \nOR " + columnName + " = '" + filter + "'";
+                    sqlSB.append(" \nOR " + columnName + " = '" + filter + "'");
                 }
             }
-            sql += ");";
-        }
+			sqlSB.append(");");
+		}
 
-        statement.execute(sql);
-        return statement.getResultSet();
+		statement.execute(sqlSB.toString());
+		ResultSet resultSet = statement.getResultSet();
+		statement.close();
+		return resultSet;
     }
 
     /**
@@ -558,13 +582,13 @@ public class SistInfData {
             throws SQLException {
 
         Statement statement = connection.createStatement();
-        String sql = "Select " + columnName + " from " + tableName + ";";
+        String sql = SELECT + columnName + FROM + tableName + ";";
         ResultSet result = statement.executeQuery(sql);
 
         // Capturamos los metadatos de la tabla
         ResultSetMetaData rmeta = result.getMetaData();
         int numColumns = rmeta.getColumnCount();
-        List<Date> listadoFechas = new ArrayList<Date>();
+        List<Date> listadoFechas = new ArrayList<>();
 
         // Recorremos las filas del cursor
         while (result.next()) {
@@ -573,6 +597,7 @@ public class SistInfData {
             }
         } // while
         result.close();
+        statement.close();
         if (minimo) {
             return Collections.min(listadoFechas);
         } else {
@@ -605,14 +630,14 @@ public class SistInfData {
             Number curso) throws SQLException {
 
         Statement statement = connection.createStatement();
-        List lista = new ArrayList();
+        List lista;
 
-        List<List> resultados = new ArrayList<List>();
+        List<List> resultados = new ArrayList<>();
 
-        String sql = "Select " + columnName + "," + columnName2 + ","
+        String sql = SELECT + columnName + "," + columnName2 + ","
                 + columnName3 + "," + columnName4
                 + ", Alumno1, Alumno2, Alumno3, Tutor1, Tutor2, Tutor3 from "
-                + tableName + " where " + columnName + " like '%" + curso
+                + tableName + WHERE + columnName + " like '%" + curso
                 + "';";
 
         ResultSet result = statement.executeQuery(sql);
@@ -644,7 +669,7 @@ public class SistInfData {
 
         }
         result.close();
-
+        statement.close();
         return resultados;
     }
 
@@ -661,7 +686,7 @@ public class SistInfData {
 
         Date date = null;
         try {
-            date = (Date) formatter.parse(g);
+            date = formatter.parse(g);
         } catch (ParseException e) {
             LOGGER.error(e);
         }
@@ -673,7 +698,7 @@ public class SistInfData {
      * 
      **/
     @Override
-    public void finalize() throws Throwable {
+    protected void finalize() throws Throwable {
         try {
             connection.close();
         } catch (SQLException e) {

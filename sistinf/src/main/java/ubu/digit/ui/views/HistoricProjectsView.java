@@ -11,7 +11,7 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 
 	private static final long serialVersionUID = 8431807779365780674L;
 
-	public static String VIEW_NAME = "historic-projects";
+	public static final String VIEW_NAME = "historic-projects";
 
 	public HistoricProjectsView() {
 		setMargin(true);
