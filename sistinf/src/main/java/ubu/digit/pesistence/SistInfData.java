@@ -35,17 +35,20 @@ import ubu.digit.util.ExternalProperties;
  */
 public class SistInfData implements Serializable {
 
-	private static final long serialVersionUID = -7003492582982197711L;
+    private static final String SELECT_ALL = "Select * ";
 
-	private static final String SELECT_ALL = "Select * ";
-
-	private static final String DISTINTO_DE_VACIO = " != '';";
+	private static final String DISTINTO_DE_VACIO = "!= ''";
 
 	private static final String WHERE = " where ";
 
 	private static final String FROM = " from ";
 
 	private static final String SELECT = "Select ";
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6019587024081762319L;
 
 	/**
      * Logger de la clase.
@@ -118,7 +121,7 @@ public class SistInfData implements Serializable {
             Properties props = new java.util.Properties();
             props.put("charset", "UTF-8");
             con = DriverManager.getConnection(url + serverPath + DIRCSV, props);
-		} catch (ClassNotFoundException | SQLException e) {
+        } catch (ClassNotFoundException| SQLException e) {
             LOGGER.error(e);
         }
         return con;
@@ -148,7 +151,6 @@ public class SistInfData implements Serializable {
                     number = result.getFloat(1);
                 }
                 result.close();
-                statement.close();
             }
         } catch (SQLException e) {
             LOGGER.error(e);
@@ -257,7 +259,6 @@ public class SistInfData implements Serializable {
             }
         } // while
         result.close();
-        statement.close();
         return media;
     }
 
@@ -307,27 +308,25 @@ public class SistInfData implements Serializable {
         return Math.sqrt(result);
     }
 
-	/**
-	 * Ejecuta una sentencia SQL obteniendo la mediana de la columna de una
-	 * tabla, ambas pasadas como parámetro.
-	 * 
-	 * @param columnName
-	 *            nombre de la columna
-	 * @param tableName
-	 *            nombre de la tabla de datos
-	 * @param percent
-	 *            cuartil
-	 * @return mediana
-	 * @throws SQLException
-	 * @throws SQLException
-	 */
-	public Number getQuartilColumn(String columnName, String tableName,
+    /**
+     * Ejecuta una sentencia SQL obteniendo la mediana de la columna de una
+     * tabla, ambas pasadas como parámetro.
+     * 
+     * @param columnName
+     *            nombre de la columna
+     * @param tableName
+     *            nombre de la tabla de datos
+     * @return mediana
+     * @throws SQLException
+     * @throws SQLException
+     */
+    public Number getQuartilColumn(String columnName, String tableName,
             double percent) throws SQLException {
 
         Number nTotalValue = getTotalNumber(columnName, tableName);
 
         String sql = SELECT + columnName + FROM + tableName + WHERE
-                + columnName + "!= ''" + " order by " + columnName;
+                + columnName + DISTINTO_DE_VACIO + " order by " + columnName;
 
         List<Double> listValues = getListNumber(columnName, sql);
 
@@ -358,7 +357,6 @@ public class SistInfData implements Serializable {
                 listValues.add(result.getDouble(columnName));
             }
             result.close();
-            statement.close();
         }
         return listValues;
     }
@@ -378,7 +376,7 @@ public class SistInfData implements Serializable {
             throws SQLException {
 
         String sql = "Select distinct count(" + columnName + ")" + "from "
-                + tableName + WHERE + columnName + DISTINTO_DE_VACIO;
+                + tableName + WHERE + columnName + " != '';";
 
         return getResultSetNumber(sql);
     }
@@ -419,17 +417,15 @@ public class SistInfData implements Serializable {
      */
     public Number getTotalNumber(String[] columnsName, String tableName)
             throws SQLException {
-        String sql;
-        Statement statement = null;
-        ResultSet results = null;
-        Set<String> noDups = new HashSet<>();
+        String sql = null;
+        Set<String> noDups = new HashSet<String>();
         if (columnsName != null) {
 
             for (int i = 0; i < columnsName.length; i++) {
                 sql = SELECT + columnsName[i] + FROM + tableName
-                        + WHERE + columnsName[i] + DISTINTO_DE_VACIO;
-				statement = connection.createStatement();
-				results = statement.executeQuery(sql);
+                        + WHERE + columnsName[i] + " != '';";
+                Statement statement = connection.createStatement();
+                ResultSet results = statement.executeQuery(sql);
 
                 ResultSetMetaData rmeta = results.getMetaData();
                 int numColumns = rmeta.getColumnCount();
@@ -440,8 +436,7 @@ public class SistInfData implements Serializable {
                     }
                 } // while
             }
-            results.close();
-            statement.close();
+
             return (float) noDups.size();
         } else {
             return 0;
@@ -477,11 +472,9 @@ public class SistInfData implements Serializable {
             throws SQLException {
         Statement statement = connection.createStatement();
         String sql = SELECT_ALL + FROM + tableName + WHERE
-                + columnName + DISTINTO_DE_VACIO;
-        
-         ResultSet resultSet = statement.executeQuery(sql);
-         statement.close();
-         return resultSet;
+                + columnName + " != '';";
+
+        return statement.executeQuery(sql);
     }
 
     /**
@@ -504,9 +497,7 @@ public class SistInfData implements Serializable {
         String sql = SELECT_ALL + FROM + tableName + " WHERE "
                 + whereCondition + ";";
         statement.execute(sql);
-        ResultSet resultSet = statement.getResultSet();
-        statement.close();
-        return resultSet;
+        return statement.getResultSet();
     }
 
     /**
@@ -528,40 +519,38 @@ public class SistInfData implements Serializable {
     public ResultSet getResultSet(String tableName, String columnName,
             String[] filters, String[] columnsName) throws SQLException {
         Statement statement = connection.createStatement();
-        StringBuilder sqlSB = new StringBuilder();
+        StringBuilder sql = new StringBuilder();
         if (columnsName == null) {
-            sqlSB.append(SELECT_ALL);
+            sql.append(SELECT_ALL);
         } else {
-            sqlSB.append(SELECT);
+            sql.append(SELECT);
             int index = 0;
             for (String selectedColumn : columnsName) {
                 if (index == 0) {
-                    sqlSB.append(" " + selectedColumn);
+                    sql.append(" " + selectedColumn);
                     index++;
                 } else {
-                    sqlSB.append(", " + selectedColumn);
+                    sql.append(", " + selectedColumn);
                 }
             }
         }
-        sqlSB.append(" \nfrom " + tableName + " \nwhere (" + columnName + " != '') ");
+        sql.append(" \nfrom " + tableName + " \nwhere (" + columnName + " != '') ");
         if (filters != null) {
-            sqlSB.append("AND (");
+            sql.append("AND (");
             int index = 0;
             for (String filter : filters) {
                 if (index == 0) {
-                    sqlSB.append(" \n" + columnName + " = '" + filter + "'");
+                    sql.append(" \n" + columnName + " = '" + filter + "'");
                     index++;
                 } else {
-                    sqlSB.append(" \nOR " + columnName + " = '" + filter + "'");
+                    sql.append(" \nOR " + columnName + " = '" + filter + "'");
                 }
             }
-			sqlSB.append(");");
-		}
+            sql.append(");");
+        }
 
-		statement.execute(sqlSB.toString());
-		ResultSet resultSet = statement.getResultSet();
-		statement.close();
-		return resultSet;
+        statement.execute(sql.toString());
+        return statement.getResultSet();
     }
 
     /**
@@ -597,7 +586,6 @@ public class SistInfData implements Serializable {
             }
         } // while
         result.close();
-        statement.close();
         if (minimo) {
             return Collections.min(listadoFechas);
         } else {
@@ -632,7 +620,7 @@ public class SistInfData implements Serializable {
         Statement statement = connection.createStatement();
         List lista;
 
-        List<List> resultados = new ArrayList<>();
+        List<List> resultados = new ArrayList<List>();
 
         String sql = SELECT + columnName + "," + columnName2 + ","
                 + columnName3 + "," + columnName4
@@ -669,7 +657,7 @@ public class SistInfData implements Serializable {
 
         }
         result.close();
-        statement.close();
+
         return resultados;
     }
 
