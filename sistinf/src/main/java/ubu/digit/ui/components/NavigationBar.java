@@ -24,33 +24,37 @@ public class NavigationBar extends CustomComponent {
 
 	private Navigator navigator;
 
+	private final String buttonHeight = "64px";
+
 	public NavigationBar() {
+		HorizontalLayout content = new HorizontalLayout();
+		content.setMargin(false);
+		content.setSpacing(false);
+		content.setWidth("100%");
+		
+		inicializarComponentes();
+		content.addComponents(botonInfo, botonActive, botonHistory, botonMetrics);
+		setCompositionRoot(content);
+	}
+
+	private void inicializarComponentes() {
 		navigator = UI.getCurrent().getNavigator();
+		
 		botonInfo = new Button("Información");
 		botonInfo.addClickListener(new GoToInformation());
 		botonActive = new Button("Proyectos activos");
 		botonHistory = new Button("Histórico");
 		botonMetrics = new Button("Métricas");
-
-		HorizontalLayout content = new HorizontalLayout();
-		content.setMargin(false);
-		content.setSpacing(false);
-		content.setWidth("100%");
-
-		botonInfo.setHeight("64px");
-		botonActive.setHeight("64px");
-		botonHistory.setHeight("64px");
-		botonMetrics.setHeight("64px");
+		
+		botonInfo.setHeight(buttonHeight);
+		botonActive.setHeight(buttonHeight);
+		botonHistory.setHeight(buttonHeight);
+		botonMetrics.setHeight(buttonHeight);
 
 		botonInfo.setWidth("100%");
 		botonActive.setWidth("100%");
 		botonHistory.setWidth("100%");
 		botonMetrics.setWidth("100%");
-
-		content.addComponents(botonInfo, botonActive, botonHistory, botonMetrics);
-
-		setCompositionRoot(content);
-
 	}
 
 	private class GoToInformation implements Button.ClickListener {
