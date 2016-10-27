@@ -31,12 +31,19 @@ public class InformationView extends VerticalLayout implements View {
 	 */
 	private static final Logger LOGGER = Logger.getLogger(SistInfData.class);
 
-	public InformationView() {
+	private ExternalProperties config;
 
-		SistInfData fachadaDatos = SistInfData.getInstance();
-		ExternalProperties config = ExternalProperties.getInstance("/WEB-INF/classes/config.properties", false);
-		String estiloTitulo = "lbl-title";
-		String lineaBlanco = "&nbsp;";
+	private SistInfData fachadaDatos;
+
+	private String estiloTitulo;
+
+	private String lineaBlanco;
+
+	public InformationView() {
+		fachadaDatos = SistInfData.getInstance();
+		config = ExternalProperties.getInstance("/WEB-INF/classes/config.properties", false);
+		estiloTitulo = "lbl-title";
+		lineaBlanco = "&nbsp;";
 
 		setMargin(true);
 		setSpacing(true);
@@ -44,7 +51,16 @@ public class InformationView extends VerticalLayout implements View {
 		NavigationBar navBar = new NavigationBar();
 		addComponent(navBar);
 
-		// TRIBUNAL
+		createTribunal();
+		createNormas();
+		createCalendar();
+		createDocumentos();
+
+		Footer footer = new Footer();
+		addComponent(footer);
+	}
+
+	private void createTribunal() {
 		Label tribunalTitle = new Label("Tribunal");
 		tribunalTitle.setStyleName(estiloTitulo);
 
@@ -76,8 +92,9 @@ public class InformationView extends VerticalLayout implements View {
 		int indexAñoSiguiente = Integer.parseInt(indexAño) + 1;
 		Label curso = new Label("Programa en vigor a partir del Curso " + indexAño + "-" + indexAñoSiguiente + ".");
 		addComponents(tribunalTitle, horizontalTribunal, curso);
+	}
 
-		// NORMAS
+	private void createNormas() {
 		addComponent(new Label(lineaBlanco, ContentMode.HTML));
 		Label normasTitle = new Label("Especificaciones de Entrega");
 		normasTitle.setStyleName(estiloTitulo);
@@ -94,8 +111,9 @@ public class InformationView extends VerticalLayout implements View {
 			LOGGER.error("Error en normas", e);
 		}
 		addComponents(normasTitle, normas);
+	}
 
-		// FECHAS
+	private void createCalendar() {
 		addComponent(new Label(lineaBlanco, ContentMode.HTML));
 		Label fechasTitle = new Label("Fechas de entrega");
 		fechasTitle.setStyleName(estiloTitulo);
@@ -105,8 +123,9 @@ public class InformationView extends VerticalLayout implements View {
 		calendar.setWidth(85, Unit.PERCENTAGE);
 		calendar.setHeight(500, Unit.PIXELS);
 		addComponents(fechasTitle, calendar);
+	}
 
-		// DOCUMENTOS
+	private void createDocumentos() {
 		addComponent(new Label(lineaBlanco, ContentMode.HTML));
 		Label documentosTitle = new Label("Documentos");
 		documentosTitle.setStyleName(estiloTitulo);
@@ -126,14 +145,10 @@ public class InformationView extends VerticalLayout implements View {
 			LOGGER.error("Error en documentos", e);
 		}
 		addComponents(documentosTitle, documentos);
-
 		addComponent(new Label(lineaBlanco, ContentMode.HTML));
-		Footer footer = new Footer();
-		addComponent(footer);
 	}
 
 	@Override
 	public void enter(ViewChangeEvent event) {
 	}
-
 }
