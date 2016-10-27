@@ -24,6 +24,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import ubu.digit.pesistence.SistInfData;
+import ubu.digit.ui.components.Footer;
 import ubu.digit.ui.components.NavigationBar;
 import ubu.digit.util.ExternalProperties;
 
@@ -147,6 +148,10 @@ public class SistInfUI extends UI {
 		}
 		content.addComponents(documentosTitle, documentos);
 
+		content.addComponent(new Label(lineaBlanco, ContentMode.HTML));
+		Footer footer = new Footer();
+		content.addComponent(footer);
+		
 		setContent(content);
 	}
 
