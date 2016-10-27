@@ -78,12 +78,6 @@ public class ExternalProperties {
         return instance;
     }
     
-    // Nomenclatura de la función original para que no de error de compilación
-    // TODO Quitar cuando no se necesiten los fuentes de htmlgen y util
-    public static ExternalProperties getInstance(String propFileName) {
-    	return null;
-    }
-    
     /**
      * Método que obtiene el valor de la propiedad que se pasa.
      * 
