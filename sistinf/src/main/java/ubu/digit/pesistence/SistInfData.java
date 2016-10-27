@@ -35,9 +35,9 @@ import ubu.digit.util.ExternalProperties;
  */
 public class SistInfData implements Serializable {
 
-    private static final String SELECT_ALL = "Select * ";
+	private static final String SELECT_ALL = "Select * ";
 
-	private static final String DISTINTO_DE_VACIO = "!= ''";
+	private static final String DISTINTO_DE_VACIO = " != ''";
 
 	private static final String WHERE = " where ";
 
@@ -151,6 +151,7 @@ public class SistInfData implements Serializable {
                     number = result.getFloat(1);
                 }
                 result.close();
+                statement.close();
             }
         } catch (SQLException e) {
             LOGGER.error(e);
@@ -259,6 +260,7 @@ public class SistInfData implements Serializable {
             }
         } // while
         result.close();
+        statement.close();
         return media;
     }
 
@@ -357,6 +359,7 @@ public class SistInfData implements Serializable {
                 listValues.add(result.getDouble(columnName));
             }
             result.close();
+            statement.close();
         }
         return listValues;
     }
@@ -376,7 +379,7 @@ public class SistInfData implements Serializable {
             throws SQLException {
 
         String sql = "Select distinct count(" + columnName + ")" + "from "
-                + tableName + WHERE + columnName + " != '';";
+                + tableName + WHERE + columnName + DISTINTO_DE_VACIO;
 
         return getResultSetNumber(sql);
     }
@@ -418,12 +421,12 @@ public class SistInfData implements Serializable {
     public Number getTotalNumber(String[] columnsName, String tableName)
             throws SQLException {
         String sql = null;
-        Set<String> noDups = new HashSet<String>();
+        Set<String> noDups = new HashSet<>();
         if (columnsName != null) {
 
             for (int i = 0; i < columnsName.length; i++) {
                 sql = SELECT + columnsName[i] + FROM + tableName
-                        + WHERE + columnsName[i] + " != '';";
+                        + WHERE + columnsName[i] + DISTINTO_DE_VACIO;
                 Statement statement = connection.createStatement();
                 ResultSet results = statement.executeQuery(sql);
 
@@ -472,7 +475,7 @@ public class SistInfData implements Serializable {
             throws SQLException {
         Statement statement = connection.createStatement();
         String sql = SELECT_ALL + FROM + tableName + WHERE
-                + columnName + " != '';";
+                + columnName + DISTINTO_DE_VACIO;
 
         return statement.executeQuery(sql);
     }
@@ -586,6 +589,7 @@ public class SistInfData implements Serializable {
             }
         } // while
         result.close();
+        statement.close();
         if (minimo) {
             return Collections.min(listadoFechas);
         } else {
@@ -620,7 +624,7 @@ public class SistInfData implements Serializable {
         Statement statement = connection.createStatement();
         List lista;
 
-        List<List> resultados = new ArrayList<List>();
+        List<List> resultados = new ArrayList<>();
 
         String sql = SELECT + columnName + "," + columnName2 + ","
                 + columnName3 + "," + columnName4
@@ -657,7 +661,7 @@ public class SistInfData implements Serializable {
 
         }
         result.close();
-
+        statement.close();
         return resultados;
     }
 
