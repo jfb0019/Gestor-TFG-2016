@@ -11,7 +11,10 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.UI;
 
+import ubu.digit.ui.views.ActiveProjectsView;
+import ubu.digit.ui.views.HistoricProjectsView;
 import ubu.digit.ui.views.InformationView;
+import ubu.digit.ui.views.MetricsView;
 
 /**
  * This UI is the application entry point. A UI may either represent a browser
@@ -34,9 +37,15 @@ public class SistInfUI extends UI {
 
 		navigator = new Navigator(this, this);
 		View informationView = new InformationView();
+		View activeProjectsView = new ActiveProjectsView();
+		View historicProjectsView = new HistoricProjectsView();
+		View metricsView = new MetricsView();
 
 		navigator.addView("", informationView);
 		navigator.addView(InformationView.VIEW_NAME, informationView);
+		navigator.addView(ActiveProjectsView.VIEW_NAME, activeProjectsView);
+		navigator.addView(HistoricProjectsView.VIEW_NAME, historicProjectsView);
+		navigator.addView(MetricsView.VIEW_NAME, metricsView);
 	}
 
 	@WebServlet(urlPatterns = "/*", name = "SistInfUIServlet", asyncSupported = true)
