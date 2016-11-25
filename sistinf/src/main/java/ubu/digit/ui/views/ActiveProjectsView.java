@@ -34,8 +34,13 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 
 	private BeanItemContainer<ActiveProjectBean> beans;
 
+	private Table table;
+
+	private String estiloTitulo;
+
 	public ActiveProjectsView() {
 		fachadaDatos = SistInfData.getInstance();
+		estiloTitulo = "lbl-title";
 		setMargin(true);
 		setSpacing(true);
 		NavigationBar navBar = new NavigationBar();
@@ -81,14 +86,36 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 	}
 
 	private void createMetrics() {
+		Label metricsTitle = new Label("Información estadística");
+		metricsTitle.setStyleName("lbl-title");
+		addComponent(metricsTitle);
+
+		try {
+			Number totalProjectsNumber = fachadaDatos.getTotalNumber("Titulo", "Proyecto");
+			Label totalProjects = new Label("- Número total de proyectos: " + totalProjectsNumber.intValue());
+
+			Number totalFreeProjectNumber = fachadaDatos.getTotalFreeProject();
+			Label totalFreeProject = new Label("- Número total de proyectos sin asignar: " + totalFreeProjectNumber.intValue());
+
+			Number totalStudentNumber = fachadaDatos.getTotalNumber("ApellidosNombre", "Alumno");
+			Label totalStudent = new Label("- Número total de alumnos: " + totalStudentNumber.intValue());
+
+			String[] tutorColumnNames = { "Tutor1", "Tutor2", "Tutor3" };
+			Number totalTutorNumber = fachadaDatos.getTotalNumber(tutorColumnNames, "Proyecto");
+			Label totalTutor = new Label("- Número total de tutores involucrados: " + totalTutorNumber.intValue());
+
+			addComponents(totalProjects, totalFreeProject, totalStudent, totalTutor);
+		} catch (SQLException e) {
+			LOGGER.error("Error en estadísticas", e);
+		}
 	}
 
 	private void createCurrentProjectsTable() {
 		Label proyectosTitle = new Label("Descripción de proyectos");
-		proyectosTitle.setStyleName("lbl-title");
+		proyectosTitle.setStyleName(estiloTitulo);
 		addComponent(proyectosTitle);
 
-		Table table = new Table();
+		table = new Table();
 		addComponent(table);
 		table.setWidth("100%");
 		table.setPageLength(9);
@@ -97,6 +124,12 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 		table.setVisibleColumns("title", "description", "tutor1", "tutor2", "tutor3", "student1", "student2",
 				"student3", "courseAssignment");
 
+		setTableColumnHeaders();
+		setColumnExpandRatios();
+		collapseOptionalFields();
+	}
+
+	private void setTableColumnHeaders() {
 		table.setColumnHeader("title", "Título");
 		table.setColumnHeader("description", "Descripción");
 		table.setColumnHeader("tutor1", "Tutor 1");
@@ -106,7 +139,9 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 		table.setColumnHeader("student2", "Alumno 2");
 		table.setColumnHeader("student3", "Alumno 3");
 		table.setColumnHeader("courseAssignment", "Curso Asignación");
+	}
 
+	private void setColumnExpandRatios() {
 		table.setColumnExpandRatio("title", 5);
 		table.setColumnExpandRatio("description", 17);
 		table.setColumnExpandRatio("tutor1", 3);
@@ -116,13 +151,16 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 		table.setColumnExpandRatio("student2", 3);
 		table.setColumnExpandRatio("student3", 3);
 		table.setColumnExpandRatio("courseAssignment", 3);
+	}
 
+	private void collapseOptionalFields() {
 		List<ActiveProjectBean> itemIds = beans.getItemIds();
 		Iterator<ActiveProjectBean> iterator = itemIds.iterator();
 		boolean student2Flag = true;
 		boolean student3Flag = true;
 		boolean tutor2Flag = true;
 		boolean tutor3Flag = true;
+		
 		while (iterator.hasNext()) {
 			ActiveProjectBean next = iterator.next();
 			ActiveProjectBean bean = beans.getItem(next).getBean();
