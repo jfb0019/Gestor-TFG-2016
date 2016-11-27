@@ -2,12 +2,16 @@ package ubu.digit.ui.views;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
 import ubu.digit.pesistence.SistInfData;
@@ -30,8 +34,13 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 
 	private SistInfData fachadaDatos;
 
+	private String estiloTitulo;
+
+	private Table table;
+
 	public HistoricProjectsView() {
 		fachadaDatos = SistInfData.getInstance();
+		estiloTitulo = "lbl-title";
 		setMargin(true);
 		setSpacing(true);
 		NavigationBar navBar = new NavigationBar();
@@ -90,9 +99,66 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 	}
 
 	private void createHistoricProjectsTable() {
+		Label projectsTitle = new Label("Descripción de proyectos");
+		projectsTitle.setStyleName(estiloTitulo);
+		addComponent(projectsTitle);
+
+		table = new Table();
+		addComponent(table);
+		table.setWidth("100%");
+		table.setPageLength(10);
+		table.setColumnCollapsingAllowed(true);
+		table.setContainerDataSource(beans);
+		table.setVisibleColumns("title", "tutor1", "tutor2", "tutor3", "numStudents", "assignmentDate", "presentationDate", "score");
+		setTableColumnHeaders();
+		setColumnExpandRatios();
+		collapseOptionalFields();
 
 	}
+	
+	private void setTableColumnHeaders() {
+		table.setColumnHeader("title", "Título");
+		table.setColumnHeader("tutor1", "Tutor 1");
+		table.setColumnHeader("tutor2", "Tutor 2");
+		table.setColumnHeader("tutor3", "Tutor 3");
+		table.setColumnHeader("numStudents", "Nº Alumnos");
+		table.setColumnHeader("assignmentDate", "Fecha Asignación");
+		table.setColumnHeader("presentationDate", "Fecha Presentación");
+		table.setColumnHeader("score", "Nota");
+	}
+	
+	private void setColumnExpandRatios() {
+		table.setColumnExpandRatio("title", 35);
+		table.setColumnExpandRatio("tutor1", 10);
+		table.setColumnExpandRatio("tutor2", 10);
+		table.setColumnExpandRatio("tutor3", 10);
+		table.setColumnExpandRatio("numStudents", 5);
+		table.setColumnExpandRatio("assignmentDate", 7);
+		table.setColumnExpandRatio("presentationDate", 8);
+		table.setColumnExpandRatio("score", 3);
+	}
+	
+	private void collapseOptionalFields() {
+		List<HistoricProjectBean> itemIds = beans.getItemIds();
+		Iterator<HistoricProjectBean> iterator = itemIds.iterator();
+		boolean tutor2Flag = true;
+		boolean tutor3Flag = true;
+		
+		while (iterator.hasNext()) {
+			HistoricProjectBean next = iterator.next();
+			HistoricProjectBean bean = beans.getItem(next).getBean();
+			if (!"".equals(bean.getTutor2()))
+				tutor2Flag = false;
+			if (!"".equals(bean.getTutor3()))
+				tutor3Flag = false;
+		}
 
+		if (tutor2Flag)
+			table.setColumnCollapsed("tutor2", true);
+		if (tutor3Flag)
+			table.setColumnCollapsed("tutor3", true);		
+	}
+	
 	@Override
 	public void enter(ViewChangeEvent event) {
 	}

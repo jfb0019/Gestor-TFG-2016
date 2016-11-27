@@ -28,7 +28,7 @@ public class HistoricProjectBean implements Serializable {
 
 	private String presentationDate;
 
-	private String mark;
+	private String score;
 
 	private int totalDays;
 
@@ -38,7 +38,7 @@ public class HistoricProjectBean implements Serializable {
 
 	public HistoricProjectBean(String title, String description, String tutor1, String tutor2, String tutor3,
 			String student1, String student2, String student3, int numStudents, String assignmentDate,
-			String presentationDate, String mark, int totalDays) {
+			String presentationDate, String score, int totalDays) {
 		this.title = title;
 		this.description = description;
 		this.tutor1 = tutor1;
@@ -50,7 +50,7 @@ public class HistoricProjectBean implements Serializable {
 		this.numStudents = numStudents;
 		this.assignmentDate = assignmentDate;
 		this.presentationDate = presentationDate;
-		this.mark = mark;
+		this.setScore(score);
 		this.totalDays = totalDays;
 	}
 
@@ -142,12 +142,12 @@ public class HistoricProjectBean implements Serializable {
 		this.presentationDate = presentationDate;
 	}
 
-	public String getMark() {
-		return mark;
+	public String getScore() {
+		return score;
 	}
 
-	public void setMark(String mark) {
-		this.mark = mark;
+	public void setScore(String score) {
+		this.score = score;
 	}
 
 	public int getTotalDays() {
@@ -157,5 +157,4 @@ public class HistoricProjectBean implements Serializable {
 	public void setTotalDays(int totalDays) {
 		this.totalDays = totalDays;
 	}
-
 }
