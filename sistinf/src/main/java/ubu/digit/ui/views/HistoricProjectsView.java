@@ -2,6 +2,7 @@ package ubu.digit.ui.views;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.List;
 
@@ -38,16 +39,21 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 
 	private Table table;
 
+	private NumberFormat formatter;
+
 	public HistoricProjectsView() {
 		fachadaDatos = SistInfData.getInstance();
 		estiloTitulo = "lbl-title";
+		formatter = NumberFormat.getInstance();
+		formatter.setMaximumFractionDigits(2);
 		setMargin(true);
 		setSpacing(true);
 		NavigationBar navBar = new NavigationBar();
 		addComponent(navBar);
 
 		createDataModel();
-		createMetrics();
+		createGlobalMetrics();
+		createYearlyMetrics();
 		createHistoricProjectsTable();
 
 		Footer footer = new Footer();
@@ -94,8 +100,41 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 
 	}
 
-	private void createMetrics() {
+	private void createGlobalMetrics() {
+		Label metricsTitle = new Label("Métricas");
+		metricsTitle.setStyleName(estiloTitulo);
+		addComponent(metricsTitle);
+		try {
+			Number totalProjectsNumber = fachadaDatos.getTotalNumber("Titulo", "Historico");
+			Label totalProjects = new Label("Número total de proyectos: " + totalProjectsNumber.intValue());
 
+			String[] studentColumnNames = { "Alumno1", "Alumno2", "Alumno3" };
+			Number totalStudentNumber = fachadaDatos.getTotalNumber(studentColumnNames, "Historico");
+			Label totalStudents = new Label("Número total de alumnos: " + totalStudentNumber.intValue());
+
+			Number avgScore = fachadaDatos.getAvgColumn("Nota", "Historico");
+			Number minScore = fachadaDatos.getMinColumn("Nota", "Historico");
+			Number maxScore = fachadaDatos.getMaxColumn("Nota", "Historico");
+			Number stdvScore = fachadaDatos.getStdvColumn("Nota", "Historico");
+			Label scoreStats = new Label("Calificación (media,min,max,stdv): " + "(" 
+					+ formatter.format(avgScore) + ", " + formatter.format(minScore) + ", " 
+					+ formatter.format(maxScore) + ", "+ formatter.format(stdvScore) +")");
+			
+			Number avgDays = fachadaDatos.getAvgColumn("TotalDias", "Historico");
+			Number minDays = fachadaDatos.getMinColumn("TotalDias", "Historico");
+			Number maxDays = fachadaDatos.getMaxColumn("TotalDias", "Historico");
+			Number stdvDays = fachadaDatos.getStdvColumn("TotalDias", "Historico");
+			Label daysStats = new Label("Tiempo/días (media,min,max,stdv): "+ "(" 
+					+ formatter.format(avgDays) + ", " + minDays.intValue() + ", " 
+					+ maxDays.intValue() + ", "+ formatter.format(stdvDays) +")");
+
+			addComponents(totalProjects, totalStudents, scoreStats, daysStats);
+		} catch (SQLException e) {
+			LOGGER.error("Error en históricos (metricas)", e);
+		}
+	}
+	
+	private void createYearlyMetrics() {
 	}
 
 	private void createHistoricProjectsTable() {
