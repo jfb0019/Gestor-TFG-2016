@@ -28,7 +28,7 @@ public class MetricsView extends VerticalLayout implements View {
 
 		addSonarImageLink();
 		
-		Footer footer = new Footer();
+		Footer footer = new Footer(null);
 		addComponent(footer);
 	}
 

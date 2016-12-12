@@ -50,7 +50,7 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 		createMetrics();
 		createCurrentProjectsTable();
 
-		Footer footer = new Footer();
+		Footer footer = new Footer("Proyecto.csv");
 		addComponent(footer);
 	}
 

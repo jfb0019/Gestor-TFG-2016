@@ -2,7 +2,6 @@ package ubu.digit.ui.views;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import org.apache.log4j.Logger;
 
 import com.vaadin.navigator.View;
@@ -57,11 +56,11 @@ public class InformationView extends VerticalLayout implements View {
 		createNormas();
 		createCalendar();
 		createDocumentos();
-
-		Footer footer = new Footer();
+		
+		Footer footer = new Footer("Tribunal.csv");
 		addComponent(footer);
 	}
-
+	
 	private void createTribunal() {
 		Label tribunalTitle = new Label("Tribunal");
 		tribunalTitle.setStyleName(estiloTitulo);

@@ -76,7 +76,7 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		createYearlyMetrics();
 		createHistoricProjectsTable();
 
-		Footer footer = new Footer();
+		Footer footer = new Footer("Historico.csv");
 		addComponent(footer);
 	}
 

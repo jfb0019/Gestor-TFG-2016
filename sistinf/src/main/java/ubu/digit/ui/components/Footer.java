@@ -1,13 +1,20 @@
 package ubu.digit.ui.components;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinService;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.VerticalLayout;
+
+import ubu.digit.util.ExternalProperties;
 
 public class Footer extends CustomComponent {
 
@@ -15,7 +22,10 @@ public class Footer extends CustomComponent {
 
 	private GridLayout content;
 
-	public Footer() {
+	private String fileName;
+
+	public Footer(String fileName) {
+		this.fileName = fileName;
 		content = new GridLayout(2, 1);
 		content.setMargin(false);
 		content.setSpacing(true);
@@ -56,6 +66,22 @@ public class Footer extends CustomComponent {
 		content.addComponent(information);
 	}
 
+	private String getLastModified(String fileName) {
+		String serverPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
+		ExternalProperties config = ExternalProperties.getInstance("/WEB-INF/classes/config.properties", false);
+		String DIRCSV = config.getSetting("dataIn");
+		String dir = serverPath + DIRCSV + "/";
+		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+		Date date = null;
+		String lastModified = null;
+		File file = new File(dir + fileName);
+		if (file.exists()) {
+			date = new Date(file.lastModified());
+			lastModified = sdf.format(date);
+		}
+		return lastModified;
+	}
+
 	private void addLicense() {
 		VerticalLayout license = new VerticalLayout();
 		license.setMargin(false);
@@ -63,12 +89,17 @@ public class Footer extends CustomComponent {
 
 		Link ccImage = new Link(null, new ExternalResource("https://creativecommons.org/licenses/by/4.0/"));
 		ccImage.setIcon(new ThemeResource("img/cc.png"));
-		
+
 		Label licenseText = new Label("This work is licensed under a: ");
 		Link ccLink = new Link("Creative Commons Attribution 4.0 International License.",
 				new ExternalResource("https://creativecommons.org/licenses/by/4.0/"));
-		
+
 		license.addComponents(ccImage, licenseText, ccLink);
+
+		if (fileName != null) {
+			String lastModified = getLastModified(fileName);
+			license.addComponent(new Label("Ultima actualización: " + lastModified));
+		}
 		content.addComponent(license);
 	}
 
