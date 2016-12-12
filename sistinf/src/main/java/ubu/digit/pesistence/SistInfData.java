@@ -616,15 +616,14 @@ public class SistInfData implements Serializable {
      * @return Un lista con todos los datos que hemos solicitado.
      * @throws SQLException
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List<List> getProjectsCurso(String columnName, String columnName2,
+    public List<List<Object>> getProjectsCurso(String columnName, String columnName2,
             String columnName3, String columnName4, String tableName,
             Number curso) throws SQLException {
 
         Statement statement = connection.createStatement();
-        List lista;
+        List<Object> lista;
 
-        List<List> resultados = new ArrayList<>();
+        List<List<Object>> resultados = new ArrayList<>();
 
         String sql = SELECT + columnName + "," + columnName2 + ","
                 + columnName3 + "," + columnName4
@@ -636,7 +635,7 @@ public class SistInfData implements Serializable {
 
         while (result.next()) {
 
-            lista = new ArrayList();
+            lista = new ArrayList<>();
             // Fecha asignación
             lista.add(transform(result.getString(columnName)));
             // Fecha presentación
