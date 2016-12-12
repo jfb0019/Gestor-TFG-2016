@@ -69,14 +69,13 @@ public class Footer extends CustomComponent {
 	private String getLastModified(String fileName) {
 		String serverPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 		ExternalProperties config = ExternalProperties.getInstance("/WEB-INF/classes/config.properties", false);
-		String DIRCSV = config.getSetting("dataIn");
-		String dir = serverPath + DIRCSV + "/";
+		String dirCsv = config.getSetting("dataIn");
+		String dir = serverPath + dirCsv + "/";
 		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-		Date date = null;
 		String lastModified = null;
 		File file = new File(dir + fileName);
 		if (file.exists()) {
-			date = new Date(file.lastModified());
+			Date date = new Date(file.lastModified());
 			lastModified = sdf.format(date);
 		}
 		return lastModified;

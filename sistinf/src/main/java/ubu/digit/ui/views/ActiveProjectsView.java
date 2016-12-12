@@ -63,7 +63,7 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 	}
 
 	private void createDataModel() {
-		beans = new BeanItemContainer<ActiveProjectBean>(ActiveProjectBean.class);
+		beans = new BeanItemContainer<>(ActiveProjectBean.class);
 		try (ResultSet result = fachadaDatos.getResultSet("Proyecto", "Titulo")) {
 			while (result.next()) {
 				String title = result.getString("Titulo");
