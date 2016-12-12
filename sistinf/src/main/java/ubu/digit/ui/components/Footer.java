@@ -16,18 +16,16 @@ public class Footer extends CustomComponent {
 	private GridLayout content;
 
 	public Footer() {
-		content = new GridLayout(3, 1);
+		content = new GridLayout(2, 1);
 		content.setMargin(false);
 		content.setSpacing(true);
 		content.setWidth("100%");
 
 		addInformation();
-		addVaadinLogo();
 		addLicense();
 
 		content.setColumnExpandRatio(0, 4);
-		content.setColumnExpandRatio(1, 1);
-		content.setColumnExpandRatio(2, 4);
+		content.setColumnExpandRatio(1, 4);
 
 		setCompositionRoot(content);
 	}
@@ -56,12 +54,6 @@ public class Footer extends CustomComponent {
 
 		information.addComponents(subtitle, version2, link2, version1, link1, tutor, linkT, copyright);
 		content.addComponent(information);
-	}
-
-	private void addVaadinLogo() {
-		Link vaadinImage = new Link(null, new ExternalResource("https://vaadin.com/home"));
-		vaadinImage.setIcon(new ThemeResource("img/logo-vaadin.png"));
-		content.addComponents(vaadinImage);
 	}
 
 	private void addLicense() {

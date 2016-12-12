@@ -53,10 +53,10 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 
 	private Map<Integer, List<List<Object>>> newProjects;
 
-    private Map<Integer, List<List<Object>>> oldProjects;
+	private Map<Integer, List<List<Object>>> oldProjects;
 
-    private Map<Integer, List<List<Object>>> presentedProjects;
-    
+	private Map<Integer, List<List<Object>>> presentedProjects;
+
 	private int minYear;
 	private int maxYear;
 
@@ -484,7 +484,7 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		if (tutor2Flag)
 			table.setColumnCollapsed("tutor2", true);
 		if (tutor3Flag)
-			table.setColumnCollapsed("tutor3", true);		
+			table.setColumnCollapsed("tutor3", true);
 	}
 	
 	@Override
