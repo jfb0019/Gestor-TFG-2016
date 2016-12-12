@@ -13,11 +13,18 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.util.filter.Or;
+import com.vaadin.data.util.filter.SimpleStringFilter;
+import com.vaadin.event.FieldEvents.TextChangeEvent;
+import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 import ubu.digit.pesistence.SistInfData;
@@ -74,6 +81,7 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		createDataModel();
 		createGlobalMetrics();
 		createYearlyMetrics();
+		createFilters();
 		createHistoricProjectsTable();
 
 		Footer footer = new Footer("Historico.csv");
@@ -424,6 +432,80 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		}
 		courseDate.setTimeInMillis(dateTime);
 		return courseDate;
+	}
+	
+	private void createFilters(){
+		HorizontalLayout filters = new HorizontalLayout();
+		filters.setSpacing(true);
+		filters.setMargin(false);
+		filters.setWidth("100%");
+		addComponent(filters);
+
+		TextField projectFilter = new TextField("Filtrar por proyectos:");
+		filters.addComponent(projectFilter);
+		projectFilter.addTextChangeListener(new TextChangeListener() {
+			private static final long serialVersionUID = 2951555260639865997L;
+			SimpleStringFilter filter = null;
+
+			@Override
+			public void textChange(TextChangeEvent event) {
+				Filterable f = (Filterable) table.getContainerDataSource();
+				if (filter != null)
+					f.removeContainerFilter(filter);
+				filter = new SimpleStringFilter("title", (String) event.getText(), true, false);
+				f.addContainerFilter(filter);
+			}
+		});
+
+		TextField tutorsFilter = new TextField("Filtrar por tutores:");
+		filters.addComponent(tutorsFilter);
+		tutorsFilter.addTextChangeListener(new TextChangeListener() {
+			private static final long serialVersionUID = 2532040717015693102L;
+			Or filter = null;
+
+			@Override
+			public void textChange(TextChangeEvent event) {
+				Filterable f = (Filterable) table.getContainerDataSource();
+				if (filter != null)
+					f.removeContainerFilter(filter);
+				filter = new Or(new SimpleStringFilter("tutor1", event.getText(), true, false),
+						new SimpleStringFilter("tutor2", event.getText(), true, false),
+						new SimpleStringFilter("tutor3", event.getText(), true, false));
+				f.addContainerFilter(filter);
+			}
+		});
+		
+		TextField assignmentDateFilter = new TextField("Filtrar por fecha de asignación:");
+		filters.addComponent(assignmentDateFilter);
+		assignmentDateFilter.addTextChangeListener(new TextChangeListener() {
+			private static final long serialVersionUID = 2951555260639865997L;
+			SimpleStringFilter filter = null;
+
+			@Override
+			public void textChange(TextChangeEvent event) {
+				Filterable f = (Filterable) table.getContainerDataSource();
+				if (filter != null)
+					f.removeContainerFilter(filter);
+				filter = new SimpleStringFilter("assignmentDate", (String) event.getText(), true, false);
+				f.addContainerFilter(filter);
+			}
+		});
+		
+		TextField presentationDateFilter = new TextField("Filtrar por fecha de presentación:");
+		filters.addComponent(presentationDateFilter);
+		presentationDateFilter.addTextChangeListener(new TextChangeListener() {
+			private static final long serialVersionUID = 2951555260639865997L;
+			SimpleStringFilter filter = null;
+
+			@Override
+			public void textChange(TextChangeEvent event) {
+				Filterable f = (Filterable) table.getContainerDataSource();
+				if (filter != null)
+					f.removeContainerFilter(filter);
+				filter = new SimpleStringFilter("presentationDate", (String) event.getText(), true, false);
+				f.addContainerFilter(filter);
+			}
+		});
 	}
 	
 	private void createHistoricProjectsTable() {

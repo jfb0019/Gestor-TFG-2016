@@ -50,7 +50,7 @@ public class HistoricProjectBean implements Serializable {
 		this.numStudents = numStudents;
 		this.assignmentDate = assignmentDate;
 		this.presentationDate = presentationDate;
-		this.setScore(score);
+		this.score = score;
 		this.totalDays = totalDays;
 	}
 

@@ -7,11 +7,18 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.util.filter.Or;
+import com.vaadin.data.util.filter.SimpleStringFilter;
+import com.vaadin.event.FieldEvents.TextChangeEvent;
+import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 import ubu.digit.pesistence.SistInfData;
@@ -48,6 +55,7 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 
 		createDataModel();
 		createMetrics();
+		createFilters();
 		createCurrentProjectsTable();
 
 		Footer footer = new Footer("Proyecto.csv");
@@ -108,6 +116,98 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 		} catch (SQLException e) {
 			LOGGER.error("Error en estadísticas", e);
 		}
+	}
+	
+	private void createFilters() {
+		HorizontalLayout filters = new HorizontalLayout();
+		filters.setSpacing(true);
+		filters.setMargin(false);
+		filters.setWidth("100%");
+		addComponent(filters);
+
+		TextField projectFilter = new TextField("Filtrar por proyectos:");
+		filters.addComponent(projectFilter);
+		projectFilter.addTextChangeListener(new TextChangeListener() {
+			private static final long serialVersionUID = 2951555260639865997L;
+			SimpleStringFilter filter = null;
+
+			@Override
+			public void textChange(TextChangeEvent event) {
+				Filterable f = (Filterable) table.getContainerDataSource();
+				if (filter != null)
+					f.removeContainerFilter(filter);
+				filter = new SimpleStringFilter("title", (String) event.getText(), true, false);
+				f.addContainerFilter(filter);
+			}
+		});
+
+		TextField descriptionFilter = new TextField("Filtrar por descripción:");
+		filters.addComponent(descriptionFilter);
+		descriptionFilter.addTextChangeListener(new TextChangeListener() {
+			private static final long serialVersionUID = -2576084801398434433L;
+			SimpleStringFilter filter = null;
+
+			@Override
+			public void textChange(TextChangeEvent event) {
+				Filterable f = (Filterable) table.getContainerDataSource();
+				if (filter != null)
+					f.removeContainerFilter(filter);
+				filter = new SimpleStringFilter("description", event.getText(), true, false);
+				f.addContainerFilter(filter);
+			}
+		});
+
+		TextField tutorsFilter = new TextField("Filtrar por tutores:");
+		filters.addComponent(tutorsFilter);
+		tutorsFilter.addTextChangeListener(new TextChangeListener() {
+			private static final long serialVersionUID = 2532040717015693102L;
+			Or filter = null;
+
+			@Override
+			public void textChange(TextChangeEvent event) {
+				Filterable f = (Filterable) table.getContainerDataSource();
+				if (filter != null)
+					f.removeContainerFilter(filter);
+				filter = new Or(new SimpleStringFilter("tutor1", event.getText(), true, false),
+						new SimpleStringFilter("tutor2", event.getText(), true, false),
+						new SimpleStringFilter("tutor3", event.getText(), true, false));
+				f.addContainerFilter(filter);
+			}
+		});
+
+		TextField studentsFilter = new TextField("Filtrar por alumnos:");
+		filters.addComponent(studentsFilter);
+		studentsFilter.addTextChangeListener(new TextChangeListener() {
+			private static final long serialVersionUID = -4947036744365165277L;
+			Or filter = null;
+
+			@Override
+			public void textChange(TextChangeEvent event) {
+				Filterable f = (Filterable) table.getContainerDataSource();
+				if (filter != null)
+					f.removeContainerFilter(filter);
+				filter = new Or(new SimpleStringFilter("student1", event.getText(), true, false),
+						new SimpleStringFilter("student2", event.getText(), true, false),
+						new SimpleStringFilter("student3", event.getText(), true, false));
+				f.addContainerFilter(filter);
+			}
+		});
+
+		TextField courseFilter = new TextField("Filtrar por curso:");
+		filters.addComponent(courseFilter);
+		courseFilter.addTextChangeListener(new TextChangeListener() {
+			private static final long serialVersionUID = 1706510943596355465L;
+			SimpleStringFilter filter = null;
+
+			@Override
+			public void textChange(TextChangeEvent event) {
+				Filterable f = (Filterable) table.getContainerDataSource();
+				if (filter != null)
+					f.removeContainerFilter(filter);
+				filter = new SimpleStringFilter("courseAssignment", (String) event.getText(), true, false);
+				f.addContainerFilter(filter);
+			}
+		});
 	}
 
 	private void createCurrentProjectsTable() {
