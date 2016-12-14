@@ -27,7 +27,7 @@ public class NavigationBar extends CustomComponent {
 
 	private Navigator navigator;
 
-	private final String buttonHeight = "64px";
+	private static final String buttonHeight = "64px";
 
 	public NavigationBar() {
 		HorizontalLayout content = new HorizontalLayout();

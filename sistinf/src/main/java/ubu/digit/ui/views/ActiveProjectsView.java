@@ -29,6 +29,28 @@ import ubu.digit.ui.components.NavigationBar;
 public class ActiveProjectsView extends VerticalLayout implements View {
 
 	private static final long serialVersionUID = 8857805864102975132L;
+	
+	private static final String TITULO = "Titulo";
+
+	private static final String PROYECTO = "Proyecto";
+
+	private static final String TITLE = "title";
+
+	private static final String DESCRIPTION = "description";
+
+	private static final String TUTOR1 = "tutor1";
+
+	private static final String TUTOR2 = "tutor2";
+
+	private static final String TUTOR3 = "tutor3";
+
+	private static final String STUDENT1 = "student1";
+
+	private static final String STUDENT2 = "student2";
+
+	private static final String STUDENT3 = "student3";
+
+	private static final String COURSE_ASSIGNMENT = "courseAssignment";
 
 	/**
 	 * Logger de la clase.
@@ -64,9 +86,9 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 
 	private void createDataModel() {
 		beans = new BeanItemContainer<>(ActiveProjectBean.class);
-		try (ResultSet result = fachadaDatos.getResultSet("Proyecto", "Titulo")) {
+		try (ResultSet result = fachadaDatos.getResultSet(PROYECTO, TITULO)) {
 			while (result.next()) {
-				String title = result.getString("Titulo");
+				String title = result.getString(TITULO);
 				String description = result.getString("Descripcion");
 				String tutor1 = result.getString("Tutor1");
 				String tutor2 = result.getString("Tutor2");
@@ -99,7 +121,7 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 		addComponent(metricsTitle);
 
 		try {
-			Number totalProjectsNumber = fachadaDatos.getTotalNumber("Titulo", "Proyecto");
+			Number totalProjectsNumber = fachadaDatos.getTotalNumber(TITULO, PROYECTO);
 			Label totalProjects = new Label("- Número total de proyectos: " + totalProjectsNumber.intValue());
 
 			Number totalFreeProjectNumber = fachadaDatos.getTotalFreeProject();
@@ -109,7 +131,7 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 			Label totalStudent = new Label("- Número total de alumnos: " + totalStudentNumber.intValue());
 
 			String[] tutorColumnNames = { "Tutor1", "Tutor2", "Tutor3" };
-			Number totalTutorNumber = fachadaDatos.getTotalNumber(tutorColumnNames, "Proyecto");
+			Number totalTutorNumber = fachadaDatos.getTotalNumber(tutorColumnNames, PROYECTO);
 			Label totalTutor = new Label("- Número total de tutores involucrados: " + totalTutorNumber.intValue());
 
 			addComponents(totalProjects, totalFreeProject, totalStudent, totalTutor);
@@ -127,23 +149,23 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 
 		TextField projectFilter = new TextField("Filtrar por proyectos:");
 		filters.addComponent(projectFilter);
-		projectFilter.addTextChangeListener(new SimpleStringFilterListener("title"));
+		projectFilter.addTextChangeListener(new SimpleStringFilterListener(TITLE));
 
 		TextField descriptionFilter = new TextField("Filtrar por descripción:");
 		filters.addComponent(descriptionFilter);
-		descriptionFilter.addTextChangeListener(new SimpleStringFilterListener("description"));
+		descriptionFilter.addTextChangeListener(new SimpleStringFilterListener(DESCRIPTION));
 
 		TextField tutorsFilter = new TextField("Filtrar por tutores:");
 		filters.addComponent(tutorsFilter);
-		tutorsFilter.addTextChangeListener(new OrSimpleStringFilter("tutor1", "tutor2","tutor3"));
+		tutorsFilter.addTextChangeListener(new OrSimpleStringFilter(TUTOR1, TUTOR2,TUTOR3));
 
 		TextField studentsFilter = new TextField("Filtrar por alumnos:");
 		filters.addComponent(studentsFilter);
-		studentsFilter.addTextChangeListener(new OrSimpleStringFilter("student1", "student2", "student3"));
+		studentsFilter.addTextChangeListener(new OrSimpleStringFilter(STUDENT1, STUDENT2, STUDENT3));
 
 		TextField courseFilter = new TextField("Filtrar por curso:");
 		filters.addComponent(courseFilter);
-		courseFilter.addTextChangeListener(new SimpleStringFilterListener("courseAssignment"));
+		courseFilter.addTextChangeListener(new SimpleStringFilterListener(COURSE_ASSIGNMENT));
 	}
 
 	private class SimpleStringFilterListener implements TextChangeListener {
@@ -201,8 +223,8 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 		table.setPageLength(9);
 		table.setColumnCollapsingAllowed(true);
 		table.setContainerDataSource(beans);
-		table.setVisibleColumns("title", "description", "tutor1", "tutor2", "tutor3", "student1", "student2",
-				"student3", "courseAssignment");
+		table.setVisibleColumns(TITLE, DESCRIPTION, TUTOR1, TUTOR2, TUTOR3, STUDENT1, STUDENT2,
+				STUDENT3, COURSE_ASSIGNMENT);
 
 		setTableColumnHeaders();
 		setColumnExpandRatios();
@@ -210,27 +232,27 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 	}
 
 	private void setTableColumnHeaders() {
-		table.setColumnHeader("title", "Título");
-		table.setColumnHeader("description", "Descripción");
-		table.setColumnHeader("tutor1", "Tutor 1");
-		table.setColumnHeader("tutor2", "Tutor 2");
-		table.setColumnHeader("tutor3", "Tutor 3");
-		table.setColumnHeader("student1", "Alumno 1");
-		table.setColumnHeader("student2", "Alumno 2");
-		table.setColumnHeader("student3", "Alumno 3");
-		table.setColumnHeader("courseAssignment", "Curso Asignación");
+		table.setColumnHeader(TITLE, "Título");
+		table.setColumnHeader(DESCRIPTION, "Descripción");
+		table.setColumnHeader(TUTOR1, "Tutor 1");
+		table.setColumnHeader(TUTOR2, "Tutor 2");
+		table.setColumnHeader(TUTOR3, "Tutor 3");
+		table.setColumnHeader(STUDENT1, "Alumno 1");
+		table.setColumnHeader(STUDENT2, "Alumno 2");
+		table.setColumnHeader(STUDENT3, "Alumno 3");
+		table.setColumnHeader(COURSE_ASSIGNMENT, "Curso Asignación");
 	}
 
 	private void setColumnExpandRatios() {
-		table.setColumnExpandRatio("title", 5);
-		table.setColumnExpandRatio("description", 17);
-		table.setColumnExpandRatio("tutor1", 3);
-		table.setColumnExpandRatio("tutor2", 3);
-		table.setColumnExpandRatio("tutor3", 3);
-		table.setColumnExpandRatio("student1", 3);
-		table.setColumnExpandRatio("student2", 3);
-		table.setColumnExpandRatio("student3", 3);
-		table.setColumnExpandRatio("courseAssignment", 3);
+		table.setColumnExpandRatio(TITLE, 5);
+		table.setColumnExpandRatio(DESCRIPTION, 17);
+		table.setColumnExpandRatio(TUTOR1, 3);
+		table.setColumnExpandRatio(TUTOR2, 3);
+		table.setColumnExpandRatio(TUTOR3, 3);
+		table.setColumnExpandRatio(STUDENT1, 3);
+		table.setColumnExpandRatio(STUDENT2, 3);
+		table.setColumnExpandRatio(STUDENT3, 3);
+		table.setColumnExpandRatio(COURSE_ASSIGNMENT, 3);
 	}
 
 	private void collapseOptionalFields() {
@@ -255,13 +277,13 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 		}
 
 		if (student2Flag)
-			table.setColumnCollapsed("student2", true);
+			table.setColumnCollapsed(STUDENT2, true);
 		if (student3Flag)
-			table.setColumnCollapsed("student3", true);
+			table.setColumnCollapsed(STUDENT3, true);
 		if (tutor2Flag)
-			table.setColumnCollapsed("tutor2", true);
+			table.setColumnCollapsed(TUTOR2, true);
 		if (tutor3Flag)
-			table.setColumnCollapsed("tutor3", true);
+			table.setColumnCollapsed(TUTOR3, true);
 	}
 
 	@Override

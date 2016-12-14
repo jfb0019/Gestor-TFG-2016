@@ -23,6 +23,8 @@ import ubu.digit.util.ExternalProperties;
 
 public class InformationView extends VerticalLayout implements View {
 
+	private static final String DESCRIPCION = "Descripcion";
+
 	private static final long serialVersionUID = 7820866989198327219L;
 
 	/**
@@ -89,9 +91,9 @@ public class InformationView extends VerticalLayout implements View {
 		}
 		horizontalTribunal.addComponents(iconoTribunal, tribunal);
 
-		String indexAño = config.getSetting("indexAño");
-		int indexAñoSiguiente = Integer.parseInt(indexAño) + 1;
-		Label curso = new Label("Programa en vigor a partir del Curso " + indexAño + "-" + indexAñoSiguiente + ".");
+		String yearIndex = config.getSetting("indexAño");
+		int nextYearIndex = Integer.parseInt(yearIndex) + 1;
+		Label curso = new Label("Programa en vigor a partir del Curso " + yearIndex + "-" + nextYearIndex + ".");
 		addComponents(tribunalTitle, horizontalTribunal, curso);
 	}
 
@@ -103,9 +105,9 @@ public class InformationView extends VerticalLayout implements View {
 		final VerticalLayout normas = new VerticalLayout();
 		normas.setSpacing(true);
 
-		try (ResultSet result = fachadaDatos.getResultSet("Norma", "Descripcion")) {
+		try (ResultSet result = fachadaDatos.getResultSet("Norma", DESCRIPCION)) {
 			while (result.next()) {
-				String descripcion = result.getString("Descripcion");
+				String descripcion = result.getString(DESCRIPCION);
 				normas.addComponent(new Label(" - " + descripcion));
 			}
 		} catch (SQLException e) {
@@ -134,9 +136,9 @@ public class InformationView extends VerticalLayout implements View {
 		final VerticalLayout documentos = new VerticalLayout();
 		documentos.setSpacing(true);
 
-		try (ResultSet result = fachadaDatos.getResultSet("Documento", "Descripcion")) {
+		try (ResultSet result = fachadaDatos.getResultSet("Documento", DESCRIPCION)) {
 			while (result.next()) {
-				String descripcion = result.getString("Descripcion");
+				String descripcion = result.getString(DESCRIPCION);
 				String url = result.getString("Url");
 				Link link = new Link(descripcion, new ExternalResource(url));
 				link.setIcon(FontAwesome.LINK);

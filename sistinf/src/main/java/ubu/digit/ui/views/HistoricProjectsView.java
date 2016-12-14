@@ -35,6 +35,30 @@ import ubu.digit.util.ExternalProperties;
 
 public class HistoricProjectsView extends VerticalLayout implements View {
 
+	private static final String SCORE = "score";
+
+	private static final String NUM_STUDENTS = "numStudents";
+
+	private static final String PRESENTATION_DATE = "presentationDate";
+
+	private static final String ASSIGNMENT_DATE = "assignmentDate";
+
+	private static final String TUTOR3 = "tutor3";
+
+	private static final String TUTOR2 = "tutor2";
+
+	private static final String TUTOR1 = "tutor1";
+
+	private static final String TITLE = "title";
+
+	private static final String TOTAL_DIAS = "TotalDias";
+
+	private static final String FECHA_PRESENTACION = "FechaPresentacion";
+
+	private static final String TITULO = "Titulo";
+
+	private static final String HISTORICO = "Historico";
+
 	private static final long serialVersionUID = 8431807779365780674L;
 
 	/**
@@ -90,10 +114,10 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 
 	private void createDataModel() {
 		beans = new BeanItemContainer<>(HistoricProjectBean.class);
-		try (ResultSet result = fachadaDatos.getResultSet("Historico", "Titulo")) {
+		try (ResultSet result = fachadaDatos.getResultSet(HISTORICO, TITULO)) {
 			while (result.next()) {
 				int numStudents = 1;
-				String title = result.getString("Titulo");
+				String title = result.getString(TITULO);
 				String description = result.getString("Descripcion");
 				String tutor1 = result.getString("Tutor1");
 				String tutor2 = result.getString("Tutor2");
@@ -114,9 +138,9 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 				else
 					numStudents++;
 				String assignmentDate = result.getString("FechaAsignacion");
-				String presentationDate = result.getString("FechaPresentacion");
+				String presentationDate = result.getString(FECHA_PRESENTACION);
 				String score = result.getString("Nota");
-				int totalDays = result.getShort("TotalDias");
+				int totalDays = result.getShort(TOTAL_DIAS);
 
 				HistoricProjectBean bean = new HistoricProjectBean(title, description, tutor1, tutor2, tutor3, student1,
 						student2, student3, numStudents, assignmentDate, presentationDate, score, totalDays);
@@ -132,17 +156,17 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		metricsTitle.setStyleName(estiloTitulo);
 		addComponent(metricsTitle);
 		try {
-			Number totalProjectsNumber = fachadaDatos.getTotalNumber("Titulo", "Historico");
+			Number totalProjectsNumber = fachadaDatos.getTotalNumber(TITULO, HISTORICO);
 			Label totalProjects = new Label("Número total de proyectos: " + totalProjectsNumber.intValue());
 
 			String[] studentColumnNames = { "Alumno1", "Alumno2", "Alumno3" };
-			Number totalStudentNumber = fachadaDatos.getTotalNumber(studentColumnNames, "Historico");
+			Number totalStudentNumber = fachadaDatos.getTotalNumber(studentColumnNames, HISTORICO);
 			Label totalStudents = new Label("Número total de alumnos: " + totalStudentNumber.intValue());
 
-			Number avgScore = fachadaDatos.getAvgColumn("Nota", "Historico");
-			Number minScore = fachadaDatos.getMinColumn("Nota", "Historico");
-			Number maxScore = fachadaDatos.getMaxColumn("Nota", "Historico");
-			Number stdvScore = fachadaDatos.getStdvColumn("Nota", "Historico");
+			Number avgScore = fachadaDatos.getAvgColumn("Nota", HISTORICO);
+			Number minScore = fachadaDatos.getMinColumn("Nota", HISTORICO);
+			Number maxScore = fachadaDatos.getMaxColumn("Nota", HISTORICO);
+			Number stdvScore = fachadaDatos.getStdvColumn("Nota", HISTORICO);
 			List<String> scores = new ArrayList<>();
 			scores.add(formatter.format(avgScore));
 			scores.add(formatter.format(minScore));
@@ -150,10 +174,10 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 			scores.add(formatter.format(stdvScore));
 			Label scoreStats = new Label("Calificación [media,min,max,stdv]: " + scores);
 			
-			Number avgDays = fachadaDatos.getAvgColumn("TotalDias", "Historico");
-			Number minDays = fachadaDatos.getMinColumn("TotalDias", "Historico");
-			Number maxDays = fachadaDatos.getMaxColumn("TotalDias", "Historico");
-			Number stdvDays = fachadaDatos.getStdvColumn("TotalDias", "Historico");
+			Number avgDays = fachadaDatos.getAvgColumn(TOTAL_DIAS, HISTORICO);
+			Number minDays = fachadaDatos.getMinColumn(TOTAL_DIAS, HISTORICO);
+			Number maxDays = fachadaDatos.getMaxColumn(TOTAL_DIAS, HISTORICO);
+			Number stdvDays = fachadaDatos.getStdvColumn(TOTAL_DIAS, HISTORICO);
 			List<String> days = new ArrayList<>();
 			days.add(formatter.format(avgDays));
 			days.add(formatter.format(minDays));
@@ -179,8 +203,8 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		yearOfProjects = new HashMap<>();
 		for (int year = minYear; year < maxYear + 1; year++) {
 			try {
-				yearOfProjects.put(year, fachadaDatos.getProjectsCurso("FechaAsignacion", "FechaPresentacion",
-						"TotalDias", "Nota", "Historico", year));
+				yearOfProjects.put(year, fachadaDatos.getProjectsCurso("FechaAsignacion", FECHA_PRESENTACION,
+						TOTAL_DIAS, "Nota", HISTORICO, year));
 			} catch (SQLException e) {
 				LOGGER.error("Error en historicos", e);
 			}
@@ -378,7 +402,7 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 			double mean = 0;
 			if (newProjects.containsKey(year)) {
 				for (int index = 0; index < newProjects.get(year).size(); index++) {
-					project = (List<Object>) newProjects.get(year).get(index);
+					project = newProjects.get(year).get(index);
 					int totalDays = (int) project.get(2);
 					mean += totalDays;
 				}
@@ -438,14 +462,14 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		Long dateTime = null;
 		if (isMinimum) {
 			try {
-				dateTime = fachadaDatos.getYear("FechaPresentacion", "Historico", true).getTime();
+				dateTime = fachadaDatos.getYear(FECHA_PRESENTACION, HISTORICO, true).getTime();
 			} catch (SQLException e) {
 				LOGGER.error("Error en obtenerCurso", e);
 			}
 
 		} else {
 			try {
-				dateTime = fachadaDatos.getYear("FechaPresentacion", "Historico", false).getTime();
+				dateTime = fachadaDatos.getYear(FECHA_PRESENTACION, HISTORICO, false).getTime();
 			} catch (SQLException e) {
 				LOGGER.error("Error en obtenerCurso", e);
 			}
@@ -462,21 +486,21 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		addComponent(filters);
 
 		TextField projectFilter = new TextField("Filtrar por proyectos:");
-		projectFilter.addTextChangeListener(new SimpleStringFilterListener("title"));
+		projectFilter.addTextChangeListener(new SimpleStringFilterListener(TITLE));
 		filters.addComponent(projectFilter);
 
 		TextField tutorsFilter = new TextField("Filtrar por tutores:");
 		filters.addComponent(tutorsFilter);
-		tutorsFilter.addTextChangeListener(new OrSimpleStringFilter("tutor1", "tutor2", "tutor3"));
+		tutorsFilter.addTextChangeListener(new OrSimpleStringFilter(TUTOR1, TUTOR2, TUTOR3));
 		
 		TextField assignmentDateFilter = new TextField("Filtrar por fecha de asignación:");
 		filters.addComponent(assignmentDateFilter);
-		assignmentDateFilter.addTextChangeListener(new SimpleStringFilterListener("assignmentDate"));
+		assignmentDateFilter.addTextChangeListener(new SimpleStringFilterListener(ASSIGNMENT_DATE));
 		
 		
 		TextField presentationDateFilter = new TextField("Filtrar por fecha de presentación:");
 		filters.addComponent(presentationDateFilter);
-		presentationDateFilter.addTextChangeListener(new SimpleStringFilterListener("presentationDate"));
+		presentationDateFilter.addTextChangeListener(new SimpleStringFilterListener(PRESENTATION_DATE));
 	}
 	
 
@@ -535,7 +559,7 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		table.setPageLength(10);
 		table.setColumnCollapsingAllowed(true);
 		table.setContainerDataSource(beans);
-		table.setVisibleColumns("title", "tutor1", "tutor2", "tutor3", "numStudents", "assignmentDate", "presentationDate", "score");
+		table.setVisibleColumns(TITLE, TUTOR1, TUTOR2, TUTOR3, NUM_STUDENTS, ASSIGNMENT_DATE, PRESENTATION_DATE, SCORE);
 		setTableColumnHeaders();
 		setColumnExpandRatios();
 		collapseOptionalFields();
@@ -543,25 +567,25 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 	}
 	
 	private void setTableColumnHeaders() {
-		table.setColumnHeader("title", "Título");
-		table.setColumnHeader("tutor1", "Tutor 1");
-		table.setColumnHeader("tutor2", "Tutor 2");
-		table.setColumnHeader("tutor3", "Tutor 3");
-		table.setColumnHeader("numStudents", "Nº Alumnos");
-		table.setColumnHeader("assignmentDate", "Fecha Asignación");
-		table.setColumnHeader("presentationDate", "Fecha Presentación");
-		table.setColumnHeader("score", "Nota");
+		table.setColumnHeader(TITLE, "Título");
+		table.setColumnHeader(TUTOR1, "Tutor 1");
+		table.setColumnHeader(TUTOR2, "Tutor 2");
+		table.setColumnHeader(TUTOR3, "Tutor 3");
+		table.setColumnHeader(NUM_STUDENTS, "Nº Alumnos");
+		table.setColumnHeader(ASSIGNMENT_DATE, "Fecha Asignación");
+		table.setColumnHeader(PRESENTATION_DATE, "Fecha Presentación");
+		table.setColumnHeader(SCORE, "Nota");
 	}
 	
 	private void setColumnExpandRatios() {
-		table.setColumnExpandRatio("title", 35);
-		table.setColumnExpandRatio("tutor1", 10);
-		table.setColumnExpandRatio("tutor2", 10);
-		table.setColumnExpandRatio("tutor3", 10);
-		table.setColumnExpandRatio("numStudents", 5);
-		table.setColumnExpandRatio("assignmentDate", 7);
-		table.setColumnExpandRatio("presentationDate", 8);
-		table.setColumnExpandRatio("score", 3);
+		table.setColumnExpandRatio(TITLE, 35);
+		table.setColumnExpandRatio(TUTOR1, 10);
+		table.setColumnExpandRatio(TUTOR2, 10);
+		table.setColumnExpandRatio(TUTOR3, 10);
+		table.setColumnExpandRatio(NUM_STUDENTS, 5);
+		table.setColumnExpandRatio(ASSIGNMENT_DATE, 7);
+		table.setColumnExpandRatio(PRESENTATION_DATE, 8);
+		table.setColumnExpandRatio(SCORE, 3);
 	}
 	
 	private void collapseOptionalFields() {
@@ -580,9 +604,9 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		}
 
 		if (tutor2Flag)
-			table.setColumnCollapsed("tutor2", true);
+			table.setColumnCollapsed(TUTOR2, true);
 		if (tutor3Flag)
-			table.setColumnCollapsed("tutor3", true);
+			table.setColumnCollapsed(TUTOR3, true);
 	}
 	
 	@Override
