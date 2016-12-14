@@ -27,7 +27,7 @@ public class NavigationBar extends CustomComponent {
 
 	private Navigator navigator;
 
-	private static final String buttonHeight = "64px";
+	private static final String BUTTON_HEIGHT = "64px";
 
 	public NavigationBar() {
 		HorizontalLayout content = new HorizontalLayout();
@@ -52,10 +52,10 @@ public class NavigationBar extends CustomComponent {
 		botonMetrics = new Button("Métricas");
 		botonMetrics.addClickListener(new ButtonClick());
 
-		botonInfo.setHeight(buttonHeight);
-		botonActive.setHeight(buttonHeight);
-		botonHistory.setHeight(buttonHeight);
-		botonMetrics.setHeight(buttonHeight);
+		botonInfo.setHeight(BUTTON_HEIGHT);
+		botonActive.setHeight(BUTTON_HEIGHT);
+		botonHistory.setHeight(BUTTON_HEIGHT);
+		botonMetrics.setHeight(BUTTON_HEIGHT);
 
 		botonInfo.setWidth("100%");
 		botonActive.setWidth("100%");
