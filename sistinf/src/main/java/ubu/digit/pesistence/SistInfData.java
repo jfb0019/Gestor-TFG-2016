@@ -58,7 +58,7 @@ public class SistInfData implements Serializable {
     /**
      * Conexión que se produce entre la base de datos y la aplicación.
      */
-    private Connection connection;
+    private transient Connection connection;
 
     /**
      * Dirección de los ficheros en la aplicación del servidor.

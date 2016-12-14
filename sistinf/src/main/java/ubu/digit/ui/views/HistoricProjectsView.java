@@ -56,13 +56,13 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 
 	private NumberFormat formatter;
 
-	private Map<Integer, List<List<Object>>> yearOfProjects;
+	private transient Map<Integer, List<List<Object>>> yearOfProjects;
 
-	private Map<Integer, List<List<Object>>> newProjects;
+	private transient Map<Integer, List<List<Object>>> newProjects;
 
-	private Map<Integer, List<List<Object>>> oldProjects;
+	private transient Map<Integer, List<List<Object>>> oldProjects;
 
-	private Map<Integer, List<List<Object>>> presentedProjects;
+	private transient Map<Integer, List<List<Object>>> presentedProjects;
 
 	private int minYear;
 	private int maxYear;
