@@ -205,16 +205,18 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 				int totalYearNumber = totalDays / 360;
 
 				if (assignmentDate.getTime().before(startDate.getTime())) {
-					for (int yearCount = 0; yearCount <= totalYearNumber; yearCount++) {
-						assignProject(year, yearCount, currentProject, true);
-					}
+					assignProjectCourses(year, currentProject, totalYearNumber, true);
 				} else {
-					for (int yearCount = 0; yearCount <= totalYearNumber; yearCount++) {
-						assignProject(year, yearCount, currentProject, false);
-					}
+					assignProjectCourses(year, currentProject, totalYearNumber, false);
 				}
 				buildPresentedProjects(currentProject);
 			}
+		}
+	}
+
+	private void assignProjectCourses(int year, List<Object> project, int totalYearNumber, boolean currentCourse) {
+		for (int yearCount = 0; yearCount <= totalYearNumber; yearCount++) {
+			assignProject(year, yearCount, project, currentCourse);
 		}
 	}
 
@@ -274,20 +276,26 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 			if (newProjects.containsKey(year)) {
 				for (int index = 0; index < newProjects.get(year).size(); index++) {
 					project = newProjects.get(year).get(index);
-					if (!"".equals(project.get(4)) && project.get(4) != null) {
-						numStudents++;
-					}
-					if (!"".equals(project.get(5)) && project.get(5) != null) {
-						numStudents++;
-					}
-					if (!"".equals(project.get(6)) && project.get(6) != null) {
-						numStudents++;
-					}
+					numStudents += getProjectNumberOfStudents(project);
 				}
 			}
 			studentsCount.put(year, numStudents);
 		}
 		return studentsCount;
+	}
+
+	private int getProjectNumberOfStudents(List<Object> project) {
+		int projectNumberOfStudents = 0;
+		if (!"".equals(project.get(4)) && project.get(4) != null) {
+			projectNumberOfStudents++;
+		}
+		if (!"".equals(project.get(5)) && project.get(5) != null) {
+			projectNumberOfStudents++;
+		}
+		if (!"".equals(project.get(6)) && project.get(6) != null) {
+			projectNumberOfStudents++;
+		}
+		return projectNumberOfStudents;
 	}
 
 	private Map<Integer, Number> getTutorsCount() {
@@ -298,20 +306,26 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 			if (newProjects.containsKey(year)) {
 				for (int index = 0; index < newProjects.get(year).size(); index++) {
 					current = newProjects.get(year).get(index);
-					if (!"".equals(current.get(7)) && current.get(7) != null) {
-						numTutors++;
-					}
-					if (!"".equals(current.get(8)) && current.get(8) != null) {
-						numTutors++;
-					}
-					if (!"".equals(current.get(9)) && current.get(9) != null) {
-						numTutors++;
-					}
+					numTutors += getProjectNumberOfTutors(current);
 				}
 			}
 			tutorsCount.put(year, numTutors);
 		}
 		return tutorsCount;
+	}
+
+	private int getProjectNumberOfTutors(List<Object> project) {
+		int projectNumberOfTutors = 0;
+		if (!"".equals(project.get(7)) && project.get(7) != null) {
+			projectNumberOfTutors++;
+		}
+		if (!"".equals(project.get(8)) && project.get(8) != null) {
+			projectNumberOfTutors++;
+		}
+		if (!"".equals(project.get(9)) && project.get(9) != null) {
+			projectNumberOfTutors++;
+		}
+		return projectNumberOfTutors;
 	}
 
 	private void createYearlyAverageStats() {
@@ -403,14 +417,20 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 			if (presentedProjects.containsKey(year)) {
 				for (int index = 0; index < presentedProjects.get(year).size(); index++) {
 					project = presentedProjects.get(year).get(index);
-					if (project.get(1) != null && !"".equals(project.get(1))) {
-						presented = presented.intValue() + 1;
-					}
+					presented = presented.intValue() + getPresentedProject(project);
 				}
 			}
 			presentedCountProjects.put(year, presented);
 		}
 		return presentedCountProjects;
+	}
+
+	private int getPresentedProject(List<Object> project) {
+		int presented = 0;
+		if (project.get(1) != null && !"".equals(project.get(1))) {
+			presented = 1;
+		}
+		return presented;
 	}
 
 	private Calendar getYearCourse(Boolean isMinimum) {
