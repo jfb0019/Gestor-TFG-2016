@@ -453,7 +453,7 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		courseDate.setTimeInMillis(dateTime);
 		return courseDate;
 	}
-	
+
 	private void createFilters(){
 		HorizontalLayout filters = new HorizontalLayout();
 		filters.setSpacing(true);
@@ -462,70 +462,66 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		addComponent(filters);
 
 		TextField projectFilter = new TextField("Filtrar por proyectos:");
+		projectFilter.addTextChangeListener(new SimpleStringFilterListener("title"));
 		filters.addComponent(projectFilter);
-		projectFilter.addTextChangeListener(new TextChangeListener() {
-			private static final long serialVersionUID = 2951555260639865997L;
-			SimpleStringFilter filter = null;
-
-			@Override
-			public void textChange(TextChangeEvent event) {
-				Filterable f = (Filterable) table.getContainerDataSource();
-				if (filter != null)
-					f.removeContainerFilter(filter);
-				filter = new SimpleStringFilter("title", (String) event.getText(), true, false);
-				f.addContainerFilter(filter);
-			}
-		});
 
 		TextField tutorsFilter = new TextField("Filtrar por tutores:");
 		filters.addComponent(tutorsFilter);
-		tutorsFilter.addTextChangeListener(new TextChangeListener() {
-			private static final long serialVersionUID = 2532040717015693102L;
-			Or filter = null;
-
-			@Override
-			public void textChange(TextChangeEvent event) {
-				Filterable f = (Filterable) table.getContainerDataSource();
-				if (filter != null)
-					f.removeContainerFilter(filter);
-				filter = new Or(new SimpleStringFilter("tutor1", event.getText(), true, false),
-						new SimpleStringFilter("tutor2", event.getText(), true, false),
-						new SimpleStringFilter("tutor3", event.getText(), true, false));
-				f.addContainerFilter(filter);
-			}
-		});
+		tutorsFilter.addTextChangeListener(new OrSimpleStringFilter("tutor1", "tutor2", "tutor3"));
 		
 		TextField assignmentDateFilter = new TextField("Filtrar por fecha de asignación:");
 		filters.addComponent(assignmentDateFilter);
-		assignmentDateFilter.addTextChangeListener(new TextChangeListener() {
-			private static final long serialVersionUID = 2951555260639865997L;
-			SimpleStringFilter filter = null;
-
-			@Override
-			public void textChange(TextChangeEvent event) {
-				Filterable f = (Filterable) table.getContainerDataSource();
-				if (filter != null)
-					f.removeContainerFilter(filter);
-				filter = new SimpleStringFilter("assignmentDate", (String) event.getText(), true, false);
-				f.addContainerFilter(filter);
-			}
-		});
+		assignmentDateFilter.addTextChangeListener(new SimpleStringFilterListener("assignmentDate"));
+		
 		
 		TextField presentationDateFilter = new TextField("Filtrar por fecha de presentación:");
 		filters.addComponent(presentationDateFilter);
-		presentationDateFilter.addTextChangeListener(new TextChangeListener() {
-			private static final long serialVersionUID = 2951555260639865997L;
-			SimpleStringFilter filter = null;
+		presentationDateFilter.addTextChangeListener(new SimpleStringFilterListener("presentationDate"));
+	}
+	
 
-			@Override
-			public void textChange(TextChangeEvent event) {
-				Filterable f = (Filterable) table.getContainerDataSource();
-				if (filter != null)
-					f.removeContainerFilter(filter);
-				filter = new SimpleStringFilter("presentationDate", (String) event.getText(), true, false);
-				f.addContainerFilter(filter);
-			}
-		});
+	private class SimpleStringFilterListener implements TextChangeListener {
+		private static final long serialVersionUID = 9041696136649951139L;
+		private SimpleStringFilter filter = null;
+		private String propertyId;
+
+		public SimpleStringFilterListener(String propertyId) {
+			this.propertyId = propertyId;
+		}
+
+		@Override
+		public void textChange(TextChangeEvent event) {
+			Filterable f = (Filterable) table.getContainerDataSource();
+			if (filter != null)
+				f.removeContainerFilter(filter);
+			filter = new SimpleStringFilter(propertyId, (String) event.getText(), true, false);
+			f.addContainerFilter(filter);
+		}
+	}
+
+	private class OrSimpleStringFilter implements TextChangeListener {
+		private static final long serialVersionUID = -8855180815378564739L;
+		private Or filter = null;
+		private String propertyId1;
+		private String propertyId2;
+		private String propertyId3;
+
+		public OrSimpleStringFilter(String propertyId1, String propertyId2, String propertyId3) {
+			this.propertyId1 = propertyId1;
+			this.propertyId2 = propertyId2;
+			this.propertyId3 = propertyId3;
+		}
+
+		@Override
+		public void textChange(TextChangeEvent event) {
+			Filterable f = (Filterable) table.getContainerDataSource();
+			if (filter != null)
+				f.removeContainerFilter(filter);
+			filter = new Or(new SimpleStringFilter(propertyId1, event.getText(), true, false),
+					new SimpleStringFilter(propertyId2, event.getText(), true, false),
+					new SimpleStringFilter(propertyId3, event.getText(), true, false));
+			f.addContainerFilter(filter);
+		}
 	}
 	
 	private void createHistoricProjectsTable() {
