@@ -571,6 +571,6 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 	
 	@Override
 	public void enter(ViewChangeEvent event) {
+		// Se inicializa el contenido de la vista en el constructor
 	}
-
 }

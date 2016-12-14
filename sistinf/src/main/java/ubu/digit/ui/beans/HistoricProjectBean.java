@@ -33,7 +33,7 @@ public class HistoricProjectBean implements Serializable {
 	private int totalDays;
 
 	public HistoricProjectBean() {
-
+		// Constructor vacío (convención JavaBean)
 	}
 
 	public HistoricProjectBean(String title, String description, String tutor1, String tutor2, String tutor3,

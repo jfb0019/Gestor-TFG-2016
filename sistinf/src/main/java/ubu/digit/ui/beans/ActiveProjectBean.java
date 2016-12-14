@@ -38,6 +38,7 @@ public class ActiveProjectBean implements Serializable {
 	}
 	
 	public ActiveProjectBean() {
+		// Constructor vacío (convención JavaBean)
 	}
 
 	public String getTitle() {

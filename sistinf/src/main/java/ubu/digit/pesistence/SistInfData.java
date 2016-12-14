@@ -58,7 +58,7 @@ public class SistInfData implements Serializable {
     /**
      * Conexión que se produce entre la base de datos y la aplicación.
      */
-    private Connection connection;
+    private transient Connection connection;
 
     /**
      * Dirección de los ficheros en la aplicación del servidor.
@@ -417,42 +417,56 @@ public class SistInfData implements Serializable {
      */
     public Number getTotalNumber(String[] columnsName, String tableName)
             throws SQLException {
-        ResultSet results = null;
+        ResultSet resultSet = null;
         Statement statement = null;
-        String sql = null;
+        String sql;
         Set<String> noDups = new HashSet<>();
         if (columnsName != null) {
             for (int i = 0; i < columnsName.length; i++) {
                 sql = SELECT + columnsName[i] + FROM + tableName
                         + WHERE + columnsName[i] + DISTINTO_DE_VACIO;
 				statement = connection.createStatement();
-				results = statement.executeQuery(sql);
-                ResultSetMetaData rmeta = results.getMetaData();
+				resultSet = statement.executeQuery(sql);
+                ResultSetMetaData rmeta = resultSet.getMetaData();
                 int numColumns = rmeta.getColumnCount();
-                // Recorremos las filas del cursor
-                while (results.next()) {
-                    for (int j = 1; j <= numColumns; ++j) {
-                        noDups.add(results.getString(j));
-                    }
-                } // while
+                while (resultSet.next()) {
+                    addUniqueStrings(resultSet, noDups, numColumns);
+                }
             }
-			if (results != null)
-				results.close();
+			if (resultSet != null)
+				resultSet.close();
 			if (statement != null)
 				statement.close();
             return (float) noDups.size();
         } else {
             return 0;
         }
-    }
+	}
 
-    /**
-     * Ejecuta una sentencia SQL obteniendo el número total de proyectos sin
-     * asignar. Se busca una cadena que contenga la subcadena "Aal".
-     * 
-     * @return número total de proyectos sin asignar
-     * @throws SQLException
-     */
+	/**
+	 * Añade a una colección sin duplicados los valores de las columnas.
+	 * 
+	 * @param resultSet
+	 *            resultado de ejecutar la sentencia sql correspondiente
+	 * @param noDups
+	 *            colección sin duplicados donde almacenar los valores 
+	 * @param numColumns
+	 *            número de columnas que tiene el resultset
+	 * @throws SQLException
+	 */
+	private void addUniqueStrings(ResultSet resultSet, Set<String> noDups, int numColumns) throws SQLException {
+		for (int j = 1; j <= numColumns; ++j) {
+			noDups.add(resultSet.getString(j));
+		}
+	}
+
+	/**
+	 * Ejecuta una sentencia SQL obteniendo el número total de proyectos sin
+	 * asignar. Se busca una cadena que contenga la subcadena "Aal".
+	 * 
+	 * @return número total de proyectos sin asignar
+	 * @throws SQLException
+	 */
     public Number getTotalFreeProject() throws SQLException {
         String sql = "Select count(*) " + "from Proyecto "
                 + " where Alumno1 like '%Aal%'";
