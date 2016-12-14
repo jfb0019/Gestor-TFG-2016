@@ -58,7 +58,7 @@ public class SistInfData implements Serializable {
     /**
      * Conexión que se produce entre la base de datos y la aplicación.
      */
-    private transient Connection connection;
+    private Connection connection;
 
     /**
      * Dirección de los ficheros en la aplicación del servidor.
@@ -145,11 +145,8 @@ public class SistInfData implements Serializable {
 
             if (hasResults) {
                 ResultSet result = statement.getResultSet();
-
-                if (result != null) {
-                    result.next();
-                    number = result.getFloat(1);
-                }
+                result.next();
+                number = result.getFloat(1);
                 result.close();
                 statement.close();
             }
@@ -420,16 +417,16 @@ public class SistInfData implements Serializable {
      */
     public Number getTotalNumber(String[] columnsName, String tableName)
             throws SQLException {
+        ResultSet results = null;
+        Statement statement = null;
         String sql = null;
         Set<String> noDups = new HashSet<>();
         if (columnsName != null) {
-
             for (int i = 0; i < columnsName.length; i++) {
                 sql = SELECT + columnsName[i] + FROM + tableName
                         + WHERE + columnsName[i] + DISTINTO_DE_VACIO;
-                Statement statement = connection.createStatement();
-                ResultSet results = statement.executeQuery(sql);
-
+				statement = connection.createStatement();
+				results = statement.executeQuery(sql);
                 ResultSetMetaData rmeta = results.getMetaData();
                 int numColumns = rmeta.getColumnCount();
                 // Recorremos las filas del cursor
@@ -439,7 +436,10 @@ public class SistInfData implements Serializable {
                     }
                 } // while
             }
-
+			if (results != null)
+				results.close();
+			if (statement != null)
+				statement.close();
             return (float) noDups.size();
         } else {
             return 0;
