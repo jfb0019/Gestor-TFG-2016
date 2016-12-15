@@ -7,12 +7,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.data.util.filter.Or;
-import com.vaadin.data.util.filter.SimpleStringFilter;
-import com.vaadin.event.FieldEvents.TextChangeEvent;
-import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.HorizontalLayout;
@@ -25,11 +20,38 @@ import ubu.digit.pesistence.SistInfData;
 import ubu.digit.ui.beans.ActiveProjectBean;
 import ubu.digit.ui.components.Footer;
 import ubu.digit.ui.components.NavigationBar;
+import ubu.digit.ui.listeners.OrSimpleStringFilterListener;
+import ubu.digit.ui.listeners.SimpleStringFilterListener;
 
 public class ActiveProjectsView extends VerticalLayout implements View {
 
 	private static final long serialVersionUID = 8857805864102975132L;
-	
+
+	/**
+	 * Logger de la clase.
+	 */
+	private static final Logger LOGGER = Logger.getLogger(ActiveProjectsView.class);
+
+	public static final String VIEW_NAME = "active-projects";
+
+	private SistInfData fachadaDatos;
+
+	private BeanItemContainer<ActiveProjectBean> beans;
+
+	private Table table;
+
+	private String estiloTitulo;
+
+	private TextField projectFilter;
+
+	private TextField descriptionFilter;
+
+	private TextField tutorsFilter;
+
+	private TextField studentsFilter;
+
+	private TextField courseFilter;
+
 	private static final String TITULO = "Titulo";
 
 	private static final String PROYECTO = "Proyecto";
@@ -52,26 +74,12 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 
 	private static final String COURSE_ASSIGNMENT = "courseAssignment";
 
-	/**
-	 * Logger de la clase.
-	 */
-	private static final Logger LOGGER = Logger.getLogger(ActiveProjectsView.class);
-
-	public static final String VIEW_NAME = "active-projects";
-
-	private SistInfData fachadaDatos;
-
-	private BeanItemContainer<ActiveProjectBean> beans;
-
-	private Table table;
-
-	private String estiloTitulo;
-
 	public ActiveProjectsView() {
 		fachadaDatos = SistInfData.getInstance();
 		estiloTitulo = "lbl-title";
 		setMargin(true);
 		setSpacing(true);
+
 		NavigationBar navBar = new NavigationBar();
 		addComponent(navBar);
 
@@ -79,6 +87,7 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 		createMetrics();
 		createFilters();
 		createCurrentProjectsTable();
+		addFiltersListeners();
 
 		Footer footer = new Footer("Proyecto.csv");
 		addComponent(footer);
@@ -125,7 +134,8 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 			Label totalProjects = new Label("- Número total de proyectos: " + totalProjectsNumber.intValue());
 
 			Number totalFreeProjectNumber = fachadaDatos.getTotalFreeProject();
-			Label totalFreeProject = new Label("- Número total de proyectos sin asignar: " + totalFreeProjectNumber.intValue());
+			Label totalFreeProject = new Label(
+					"- Número total de proyectos sin asignar: " + totalFreeProjectNumber.intValue());
 
 			Number totalStudentNumber = fachadaDatos.getTotalNumber("ApellidosNombre", "Alumno");
 			Label totalStudent = new Label("- Número total de alumnos: " + totalStudentNumber.intValue());
@@ -139,77 +149,32 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 			LOGGER.error("Error en estadísticas", e);
 		}
 	}
-	
+
 	private void createFilters() {
+		Label filtersTitle = new Label("Filtros");
+		filtersTitle.setStyleName(estiloTitulo);
+		addComponent(filtersTitle);
+
 		HorizontalLayout filters = new HorizontalLayout();
 		filters.setSpacing(true);
 		filters.setMargin(false);
 		filters.setWidth("100%");
 		addComponent(filters);
 
-		TextField projectFilter = new TextField("Filtrar por proyectos:");
+		projectFilter = new TextField("Filtrar por proyectos:");
 		filters.addComponent(projectFilter);
-		projectFilter.addTextChangeListener(new SimpleStringFilterListener(TITLE));
 
-		TextField descriptionFilter = new TextField("Filtrar por descripción:");
+		descriptionFilter = new TextField("Filtrar por descripción:");
 		filters.addComponent(descriptionFilter);
-		descriptionFilter.addTextChangeListener(new SimpleStringFilterListener(DESCRIPTION));
 
-		TextField tutorsFilter = new TextField("Filtrar por tutores:");
+		tutorsFilter = new TextField("Filtrar por tutores:");
 		filters.addComponent(tutorsFilter);
-		tutorsFilter.addTextChangeListener(new OrSimpleStringFilter(TUTOR1, TUTOR2,TUTOR3));
 
-		TextField studentsFilter = new TextField("Filtrar por alumnos:");
+		studentsFilter = new TextField("Filtrar por alumnos:");
 		filters.addComponent(studentsFilter);
-		studentsFilter.addTextChangeListener(new OrSimpleStringFilter(STUDENT1, STUDENT2, STUDENT3));
 
-		TextField courseFilter = new TextField("Filtrar por curso:");
+		courseFilter = new TextField("Filtrar por curso:");
 		filters.addComponent(courseFilter);
-		courseFilter.addTextChangeListener(new SimpleStringFilterListener(COURSE_ASSIGNMENT));
-	}
-
-	private class SimpleStringFilterListener implements TextChangeListener {
-		private static final long serialVersionUID = 9041696136649951139L;
-		private SimpleStringFilter filter = null;
-		private String propertyId;
-
-		public SimpleStringFilterListener(String propertyId) {
-			this.propertyId = propertyId;
-		}
-
-		@Override
-		public void textChange(TextChangeEvent event) {
-			Filterable f = (Filterable) table.getContainerDataSource();
-			if (filter != null)
-				f.removeContainerFilter(filter);
-			filter = new SimpleStringFilter(propertyId, (String) event.getText(), true, false);
-			f.addContainerFilter(filter);
-		}
-	}
-
-	private class OrSimpleStringFilter implements TextChangeListener {
-		private static final long serialVersionUID = -8855180815378564739L;
-		private Or filter = null;
-		private String propertyId1;
-		private String propertyId2;
-		private String propertyId3;
-
-		public OrSimpleStringFilter(String propertyId1, String propertyId2, String propertyId3) {
-			this.propertyId1 = propertyId1;
-			this.propertyId2 = propertyId2;
-			this.propertyId3 = propertyId3;
-		}
-
-		@Override
-		public void textChange(TextChangeEvent event) {
-			Filterable f = (Filterable) table.getContainerDataSource();
-			if (filter != null)
-				f.removeContainerFilter(filter);
-			filter = new Or(new SimpleStringFilter(propertyId1, event.getText(), true, false),
-					new SimpleStringFilter(propertyId2, event.getText(), true, false),
-					new SimpleStringFilter(propertyId3, event.getText(), true, false));
-			f.addContainerFilter(filter);
-		}
 	}
 
 	private void createCurrentProjectsTable() {
@@ -223,8 +188,8 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 		table.setPageLength(9);
 		table.setColumnCollapsingAllowed(true);
 		table.setContainerDataSource(beans);
-		table.setVisibleColumns(TITLE, DESCRIPTION, TUTOR1, TUTOR2, TUTOR3, STUDENT1, STUDENT2,
-				STUDENT3, COURSE_ASSIGNMENT);
+		table.setVisibleColumns(TITLE, DESCRIPTION, TUTOR1, TUTOR2, TUTOR3, STUDENT1, STUDENT2, STUDENT3,
+				COURSE_ASSIGNMENT);
 
 		setTableColumnHeaders();
 		setColumnExpandRatios();
@@ -262,7 +227,7 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 		boolean student3Flag = true;
 		boolean tutor2Flag = true;
 		boolean tutor3Flag = true;
-		
+
 		while (iterator.hasNext()) {
 			ActiveProjectBean next = iterator.next();
 			ActiveProjectBean bean = beans.getItem(next).getBean();
@@ -284,6 +249,14 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 			table.setColumnCollapsed(TUTOR2, true);
 		if (tutor3Flag)
 			table.setColumnCollapsed(TUTOR3, true);
+	}
+
+	private void addFiltersListeners() {
+		projectFilter.addTextChangeListener(new SimpleStringFilterListener(table, TITLE));
+		descriptionFilter.addTextChangeListener(new SimpleStringFilterListener(table, DESCRIPTION));
+		tutorsFilter.addTextChangeListener(new OrSimpleStringFilterListener(table, TUTOR1, TUTOR2, TUTOR3));
+		studentsFilter.addTextChangeListener(new OrSimpleStringFilterListener(table, STUDENT1, STUDENT2, STUDENT3));
+		courseFilter.addTextChangeListener(new SimpleStringFilterListener(table, COURSE_ASSIGNMENT));
 	}
 
 	@Override

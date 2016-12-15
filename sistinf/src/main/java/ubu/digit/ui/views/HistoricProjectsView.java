@@ -13,12 +13,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.data.util.filter.Or;
-import com.vaadin.data.util.filter.SimpleStringFilter;
-import com.vaadin.event.FieldEvents.TextChangeEvent;
-import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.HorizontalLayout;
@@ -31,33 +26,11 @@ import ubu.digit.pesistence.SistInfData;
 import ubu.digit.ui.beans.HistoricProjectBean;
 import ubu.digit.ui.components.Footer;
 import ubu.digit.ui.components.NavigationBar;
+import ubu.digit.ui.listeners.OrSimpleStringFilterListener;
+import ubu.digit.ui.listeners.SimpleStringFilterListener;
 import ubu.digit.util.ExternalProperties;
 
 public class HistoricProjectsView extends VerticalLayout implements View {
-
-	private static final String SCORE = "score";
-
-	private static final String NUM_STUDENTS = "numStudents";
-
-	private static final String PRESENTATION_DATE = "presentationDate";
-
-	private static final String ASSIGNMENT_DATE = "assignmentDate";
-
-	private static final String TUTOR3 = "tutor3";
-
-	private static final String TUTOR2 = "tutor2";
-
-	private static final String TUTOR1 = "tutor1";
-
-	private static final String TITLE = "title";
-
-	private static final String TOTAL_DIAS = "TotalDias";
-
-	private static final String FECHA_PRESENTACION = "FechaPresentacion";
-
-	private static final String TITULO = "Titulo";
-
-	private static final String HISTORICO = "Historico";
 
 	private static final long serialVersionUID = 8431807779365780674L;
 
@@ -73,7 +46,7 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 	private SistInfData fachadaDatos;
 
 	private ExternalProperties config;
-	
+
 	private String estiloTitulo;
 
 	private Table table;
@@ -89,7 +62,40 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 	private transient Map<Integer, List<List<Object>>> presentedProjects;
 
 	private int minYear;
+
 	private int maxYear;
+
+	private TextField projectFilter;
+
+	private TextField tutorsFilter;
+
+	private TextField assignmentDateFilter;
+
+	private TextField presentationDateFilter;
+
+	private static final String TITULO = "Titulo";
+
+	private static final String HISTORICO = "Historico";
+
+	private static final String TOTAL_DIAS = "TotalDias";
+
+	private static final String FECHA_PRESENTACION = "FechaPresentacion";
+
+	private static final String TITLE = "title";
+
+	private static final String NUM_STUDENTS = "numStudents";
+
+	private static final String TUTOR1 = "tutor1";
+
+	private static final String TUTOR2 = "tutor2";
+
+	private static final String TUTOR3 = "tutor3";
+
+	private static final String SCORE = "score";
+
+	private static final String ASSIGNMENT_DATE = "assignmentDate";
+
+	private static final String PRESENTATION_DATE = "presentationDate";
 
 	public HistoricProjectsView() {
 		fachadaDatos = SistInfData.getInstance();
@@ -107,6 +113,7 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		createYearlyMetrics();
 		createFilters();
 		createHistoricProjectsTable();
+		addFiltersListeners();
 
 		Footer footer = new Footer("Historico.csv");
 		addComponent(footer);
@@ -173,7 +180,7 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 			scores.add(formatter.format(maxScore));
 			scores.add(formatter.format(stdvScore));
 			Label scoreStats = new Label("Calificación [media,min,max,stdv]: " + scores);
-			
+
 			Number avgDays = fachadaDatos.getAvgColumn(TOTAL_DIAS, HISTORICO);
 			Number minDays = fachadaDatos.getMinColumn(TOTAL_DIAS, HISTORICO);
 			Number maxDays = fachadaDatos.getMaxColumn(TOTAL_DIAS, HISTORICO);
@@ -183,7 +190,7 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 			days.add(formatter.format(minDays));
 			days.add(formatter.format(maxDays));
 			days.add(formatter.format(stdvDays));
-			Label daysStats = new Label("Tiempo/días [media,min,max,stdv]: "+ days);
+			Label daysStats = new Label("Tiempo/días [media,min,max,stdv]: " + days);
 
 			addComponents(totalProjects, totalStudents, scoreStats, daysStats);
 		} catch (SQLException e) {
@@ -419,18 +426,22 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		List<Number> yearlyAssignedStudents = new ArrayList<>();
 		List<Number> yearlyAssignedTutors = new ArrayList<>();
 
-		for (int year = minYear; year <= maxYear; year++){
+		for (int year = minYear; year <= maxYear; year++) {
 			yearlyAssignedProjects.add(newProjects.get(year).size());
 			yearlyAssignedStudents.add(getStudentsCount().get(year));
 			yearlyAssignedTutors.add(getTutorsCount().get(year));
 			yearlyPresentedProjects.add(getPresentedCountProjects().get(year));
 		}
-		
-		Label asignedYearlyProjects = new Label("Número total de proyectos asignados por curso: " + yearlyAssignedProjects);
-		Label presentedYearlyProjects = new Label("Número total de proyectos presentados por curso: " + yearlyPresentedProjects);
-		Label asignedYearlyStudents = new Label("Número total de alumnos asignados por curso: " + yearlyAssignedStudents);
-		Label asignedYearlyTutors = new Label("Número total de tutores con nuevas asignaciones por curso: " + yearlyAssignedTutors);
-		addComponents(asignedYearlyProjects,presentedYearlyProjects,asignedYearlyStudents,asignedYearlyTutors);
+
+		Label asignedYearlyProjects = new Label(
+				"Número total de proyectos asignados por curso: " + yearlyAssignedProjects);
+		Label presentedYearlyProjects = new Label(
+				"Número total de proyectos presentados por curso: " + yearlyPresentedProjects);
+		Label asignedYearlyStudents = new Label(
+				"Número total de alumnos asignados por curso: " + yearlyAssignedStudents);
+		Label asignedYearlyTutors = new Label(
+				"Número total de tutores con nuevas asignaciones por curso: " + yearlyAssignedTutors);
+		addComponents(asignedYearlyProjects, presentedYearlyProjects, asignedYearlyStudents, asignedYearlyTutors);
 	}
 
 	private Map<Integer, Number> getPresentedCountProjects() {
@@ -478,76 +489,30 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		return courseDate;
 	}
 
-	private void createFilters(){
+	private void createFilters() {
+		Label filtersTitle = new Label("Filtros");
+		filtersTitle.setStyleName(estiloTitulo);
+		addComponent(filtersTitle);
+
 		HorizontalLayout filters = new HorizontalLayout();
 		filters.setSpacing(true);
 		filters.setMargin(false);
 		filters.setWidth("100%");
 		addComponent(filters);
 
-		TextField projectFilter = new TextField("Filtrar por proyectos:");
-		projectFilter.addTextChangeListener(new SimpleStringFilterListener(TITLE));
+		projectFilter = new TextField("Filtrar por proyectos:");
 		filters.addComponent(projectFilter);
 
-		TextField tutorsFilter = new TextField("Filtrar por tutores:");
+		tutorsFilter = new TextField("Filtrar por tutores:");
 		filters.addComponent(tutorsFilter);
-		tutorsFilter.addTextChangeListener(new OrSimpleStringFilter(TUTOR1, TUTOR2, TUTOR3));
-		
-		TextField assignmentDateFilter = new TextField("Filtrar por fecha de asignación:");
+
+		assignmentDateFilter = new TextField("Filtrar por fecha de asignación:");
 		filters.addComponent(assignmentDateFilter);
-		assignmentDateFilter.addTextChangeListener(new SimpleStringFilterListener(ASSIGNMENT_DATE));
-		
-		
-		TextField presentationDateFilter = new TextField("Filtrar por fecha de presentación:");
+
+		presentationDateFilter = new TextField("Filtrar por fecha de presentación:");
 		filters.addComponent(presentationDateFilter);
-		presentationDateFilter.addTextChangeListener(new SimpleStringFilterListener(PRESENTATION_DATE));
-	}
-	
-
-	private class SimpleStringFilterListener implements TextChangeListener {
-		private static final long serialVersionUID = 9041696136649951139L;
-		private SimpleStringFilter filter = null;
-		private String propertyId;
-
-		public SimpleStringFilterListener(String propertyId) {
-			this.propertyId = propertyId;
-		}
-
-		@Override
-		public void textChange(TextChangeEvent event) {
-			Filterable f = (Filterable) table.getContainerDataSource();
-			if (filter != null)
-				f.removeContainerFilter(filter);
-			filter = new SimpleStringFilter(propertyId, (String) event.getText(), true, false);
-			f.addContainerFilter(filter);
-		}
 	}
 
-	private class OrSimpleStringFilter implements TextChangeListener {
-		private static final long serialVersionUID = -8855180815378564739L;
-		private Or filter = null;
-		private String propertyId1;
-		private String propertyId2;
-		private String propertyId3;
-
-		public OrSimpleStringFilter(String propertyId1, String propertyId2, String propertyId3) {
-			this.propertyId1 = propertyId1;
-			this.propertyId2 = propertyId2;
-			this.propertyId3 = propertyId3;
-		}
-
-		@Override
-		public void textChange(TextChangeEvent event) {
-			Filterable f = (Filterable) table.getContainerDataSource();
-			if (filter != null)
-				f.removeContainerFilter(filter);
-			filter = new Or(new SimpleStringFilter(propertyId1, event.getText(), true, false),
-					new SimpleStringFilter(propertyId2, event.getText(), true, false),
-					new SimpleStringFilter(propertyId3, event.getText(), true, false));
-			f.addContainerFilter(filter);
-		}
-	}
-	
 	private void createHistoricProjectsTable() {
 		Label projectsTitle = new Label("Descripción de proyectos");
 		projectsTitle.setStyleName(estiloTitulo);
@@ -560,12 +525,12 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		table.setColumnCollapsingAllowed(true);
 		table.setContainerDataSource(beans);
 		table.setVisibleColumns(TITLE, TUTOR1, TUTOR2, TUTOR3, NUM_STUDENTS, ASSIGNMENT_DATE, PRESENTATION_DATE, SCORE);
+
 		setTableColumnHeaders();
 		setColumnExpandRatios();
 		collapseOptionalFields();
-
 	}
-	
+
 	private void setTableColumnHeaders() {
 		table.setColumnHeader(TITLE, "Título");
 		table.setColumnHeader(TUTOR1, "Tutor 1");
@@ -576,7 +541,7 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		table.setColumnHeader(PRESENTATION_DATE, "Fecha Presentación");
 		table.setColumnHeader(SCORE, "Nota");
 	}
-	
+
 	private void setColumnExpandRatios() {
 		table.setColumnExpandRatio(TITLE, 35);
 		table.setColumnExpandRatio(TUTOR1, 10);
@@ -587,13 +552,13 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		table.setColumnExpandRatio(PRESENTATION_DATE, 8);
 		table.setColumnExpandRatio(SCORE, 3);
 	}
-	
+
 	private void collapseOptionalFields() {
 		List<HistoricProjectBean> itemIds = beans.getItemIds();
 		Iterator<HistoricProjectBean> iterator = itemIds.iterator();
 		boolean tutor2Flag = true;
 		boolean tutor3Flag = true;
-		
+
 		while (iterator.hasNext()) {
 			HistoricProjectBean next = iterator.next();
 			HistoricProjectBean bean = beans.getItem(next).getBean();
@@ -608,7 +573,14 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		if (tutor3Flag)
 			table.setColumnCollapsed(TUTOR3, true);
 	}
-	
+
+	private void addFiltersListeners() {
+		projectFilter.addTextChangeListener(new SimpleStringFilterListener(table, TITLE));
+		tutorsFilter.addTextChangeListener(new OrSimpleStringFilterListener(table, TUTOR1, TUTOR2, TUTOR3));
+		assignmentDateFilter.addTextChangeListener(new SimpleStringFilterListener(table, ASSIGNMENT_DATE));
+		presentationDateFilter.addTextChangeListener(new SimpleStringFilterListener(table, PRESENTATION_DATE));
+	}
+
 	@Override
 	public void enter(ViewChangeEvent event) {
 		// Se inicializa el contenido de la vista en el constructor
