@@ -13,11 +13,17 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.vaadin.data.Property;
+import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Page;
+import com.vaadin.shared.Position;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -529,6 +535,7 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		setTableColumnHeaders();
 		setColumnExpandRatios();
 		collapseOptionalFields();
+		showDescriptionOnClick();
 	}
 
 	private void setTableColumnHeaders() {
@@ -572,6 +579,36 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 			table.setColumnCollapsed(TUTOR2, true);
 		if (tutor3Flag)
 			table.setColumnCollapsed(TUTOR3, true);
+	}
+
+	private void showDescriptionOnClick() {
+		table.setSelectable(true);
+		table.setMultiSelect(false);
+		table.setImmediate(true);
+		table.setNullSelectionAllowed(true);
+		table.addValueChangeListener(new Property.ValueChangeListener() {
+			private static final long serialVersionUID = -5055796506090094836L;
+
+			@Override
+			public void valueChange(ValueChangeEvent event) {
+				if (event.getProperty().getValue() != null) {
+					HistoricProjectBean value = (HistoricProjectBean) event.getProperty().getValue();
+					String description = value.getDescription();
+
+					if (description != null && !"".equals(description)) {
+						Notification notification = new Notification("", description,
+								Notification.Type.HUMANIZED_MESSAGE);
+						notification.setDelayMsec(10000);
+						notification.setPosition(Position.BOTTOM_CENTER);
+						notification.show(Page.getCurrent());
+						notification.setIcon(FontAwesome.FILE_TEXT_O);
+					} else {
+						Notification.show("Información", "No hay una descripción disponible para ese proyecto",
+								Notification.Type.HUMANIZED_MESSAGE);
+					}
+				}
+			}
+		});
 	}
 
 	private void addFiltersListeners() {
