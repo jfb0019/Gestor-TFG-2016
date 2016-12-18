@@ -111,6 +111,7 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		formatter.setMaximumFractionDigits(2);
 		setMargin(true);
 		setSpacing(true);
+		
 		NavigationBar navBar = new NavigationBar();
 		addComponent(navBar);
 
@@ -600,8 +601,8 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 								Notification.Type.HUMANIZED_MESSAGE);
 						notification.setDelayMsec(10000);
 						notification.setPosition(Position.BOTTOM_CENTER);
-						notification.show(Page.getCurrent());
 						notification.setIcon(FontAwesome.FILE_TEXT_O);
+						notification.show(Page.getCurrent());
 					} else {
 						Notification.show("Información", "No hay una descripción disponible para ese proyecto",
 								Notification.Type.HUMANIZED_MESSAGE);

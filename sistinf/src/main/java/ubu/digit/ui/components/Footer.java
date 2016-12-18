@@ -8,12 +8,15 @@ import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinService;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
+import ubu.digit.ui.views.UploadCsvView;
 import ubu.digit.util.ExternalProperties;
 
 public class Footer extends CustomComponent {
@@ -99,7 +102,10 @@ public class Footer extends CustomComponent {
 			String lastModified = getLastModified(fileName);
 			license.addComponent(new Label("Ultima actualización: " + lastModified));
 		}
+
+		Button login = new Button("Actualizar");
+		login.addClickListener(e -> UI.getCurrent().getNavigator().navigateTo(UploadCsvView.VIEW_NAME));
+		license.addComponent(login);
 		content.addComponent(license);
 	}
-
 }
