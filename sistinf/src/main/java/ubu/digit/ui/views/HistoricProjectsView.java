@@ -587,29 +587,30 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		table.setMultiSelect(false);
 		table.setImmediate(true);
 		table.setNullSelectionAllowed(true);
-		table.addValueChangeListener(new Property.ValueChangeListener() {
-			private static final long serialVersionUID = -5055796506090094836L;
+		table.addValueChangeListener(new TableValueChangeListener());
+	}
 
-			@Override
-			public void valueChange(ValueChangeEvent event) {
-				if (event.getProperty().getValue() != null) {
-					HistoricProjectBean value = (HistoricProjectBean) event.getProperty().getValue();
-					String description = value.getDescription();
+	private class TableValueChangeListener implements Property.ValueChangeListener {
+		private static final long serialVersionUID = -5055796506090094836L;
 
-					if (description != null && !"".equals(description)) {
-						Notification notification = new Notification("", description,
-								Notification.Type.HUMANIZED_MESSAGE);
-						notification.setDelayMsec(10000);
-						notification.setPosition(Position.BOTTOM_CENTER);
-						notification.setIcon(FontAwesome.FILE_TEXT_O);
-						notification.show(Page.getCurrent());
-					} else {
-						Notification.show("Información", "No hay una descripción disponible para ese proyecto",
-								Notification.Type.HUMANIZED_MESSAGE);
-					}
+		@Override
+		public void valueChange(ValueChangeEvent event) {
+			if (event.getProperty().getValue() != null) {
+				HistoricProjectBean value = (HistoricProjectBean) event.getProperty().getValue();
+				String description = value.getDescription();
+
+				if (description != null && !"".equals(description)) {
+					Notification notification = new Notification("", description, Notification.Type.HUMANIZED_MESSAGE);
+					notification.setDelayMsec(10000);
+					notification.setPosition(Position.BOTTOM_CENTER);
+					notification.setIcon(FontAwesome.FILE_TEXT_O);
+					notification.show(Page.getCurrent());
+				} else {
+					Notification.show("Información", "No hay una descripción disponible para ese proyecto",
+							Notification.Type.HUMANIZED_MESSAGE);
 				}
 			}
-		});
+		}
 	}
 
 	private void addFiltersListeners() {

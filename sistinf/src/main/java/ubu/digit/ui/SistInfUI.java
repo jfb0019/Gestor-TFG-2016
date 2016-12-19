@@ -54,32 +54,34 @@ public class SistInfUI extends UI {
 		navigator.addView(MetricsView.VIEW_NAME, metricsView);
 		navigator.addView(LoginView.VIEW_NAME, loginView);
 		navigator.addView(UploadCsvView.VIEW_NAME, uploadCsvView);
-		navigator.addViewChangeListener(new ViewChangeListener() {
+		navigator.addViewChangeListener(new NavigatorViewChangeListener());
+	}
 
-			private static final long serialVersionUID = -650123765531182231L;
+	private class NavigatorViewChangeListener implements ViewChangeListener {
+		private static final long serialVersionUID = -650123765531182231L;
 
-			@Override
-			public boolean beforeViewChange(ViewChangeEvent event) {
-				boolean isUserLoggedIn = getSession().getAttribute("user") != null;
-				boolean isNextViewLoginView = event.getNewView() instanceof LoginView;
-				boolean isNextViewUploadCsvView = event.getNewView() instanceof UploadCsvView;
+		@Override
+		public boolean beforeViewChange(ViewChangeEvent event) {
+			boolean isUserLoggedIn = getSession().getAttribute("user") != null;
+			boolean isNextViewLoginView = event.getNewView() instanceof LoginView;
+			boolean isNextViewUploadCsvView = event.getNewView() instanceof UploadCsvView;
 
-				if (!isUserLoggedIn && isNextViewUploadCsvView) {
-					Notification.show("Error", "Por favor inicie sesión para acceder a esta página.", Notification.Type.WARNING_MESSAGE);
-					getNavigator().navigateTo(LoginView.VIEW_NAME);
-					return false;
-				} else if (isUserLoggedIn && isNextViewLoginView) {
-					getNavigator().navigateTo(UploadCsvView.VIEW_NAME);
-					return false;
-				}
-				return true;
+			if (!isUserLoggedIn && isNextViewUploadCsvView) {
+				Notification.show("Error", "Por favor inicie sesión para acceder a esta página.",
+						Notification.Type.WARNING_MESSAGE);
+				getNavigator().navigateTo(LoginView.VIEW_NAME);
+				return false;
+			} else if (isUserLoggedIn && isNextViewLoginView) {
+				getNavigator().navigateTo(UploadCsvView.VIEW_NAME);
+				return false;
 			}
+			return true;
+		}
 
-			@Override
-			public void afterViewChange(ViewChangeEvent event) {
-
-			}
-		});
+		@Override
+		public void afterViewChange(ViewChangeEvent event) {
+			// Not needed
+		}
 	}
 
 	@WebServlet(urlPatterns = "/*", name = "SistInfUIServlet", asyncSupported = true)
