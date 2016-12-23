@@ -428,13 +428,17 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 	}
 
 	private void createYearlyTotalStats() {
+		List<String> courses = new ArrayList<>();
 		List<Number> yearlyAssignedProjects = new ArrayList<>();
+		List<Number> yearlyOldProjects = new ArrayList<>();
 		List<Number> yearlyPresentedProjects = new ArrayList<>();
 		List<Number> yearlyAssignedStudents = new ArrayList<>();
 		List<Number> yearlyAssignedTutors = new ArrayList<>();
 
 		for (int year = minYear; year <= maxYear; year++) {
-			yearlyAssignedProjects.add(newProjects.get(year).size());
+			courses.add(year - 1 + "/" + year);
+			yearlyAssignedProjects.add(geProjectsCount(newProjects).get(year));
+			yearlyOldProjects.add(geProjectsCount(oldProjects).get(year));
 			yearlyAssignedStudents.add(getStudentsCount().get(year));
 			yearlyAssignedTutors.add(getTutorsCount().get(year));
 			yearlyPresentedProjects.add(getPresentedCountProjects().get(year));
@@ -448,7 +452,21 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 				"Número total de alumnos asignados por curso: " + yearlyAssignedStudents);
 		Label asignedYearlyTutors = new Label(
 				"Número total de tutores con nuevas asignaciones por curso: " + yearlyAssignedTutors);
-		addComponents(asignedYearlyProjects, presentedYearlyProjects, asignedYearlyStudents, asignedYearlyTutors);
+		Label asignedOldProjects = new Label("Número de proyectos ya asignados por curso: " + yearlyOldProjects);
+		Label allCourses = new Label("Cursos: " + courses);
+		addComponents(asignedYearlyProjects, presentedYearlyProjects, asignedYearlyStudents, asignedYearlyTutors,
+				asignedOldProjects, allCourses);
+	}
+
+	private Map<Integer, Number> geProjectsCount(Map<Integer, List<List<Object>>> projects) {
+		Map<Integer, Number> projectsCount = new HashMap<Integer, Number>();
+		for (int year = minYear; year <= maxYear; year++) {
+			int totalProjects = 0;
+			if (projects.containsKey(year))
+				totalProjects += projects.get(year).size();
+			projectsCount.put(year, totalProjects);
+		}
+		return projectsCount;
 	}
 
 	private Map<Integer, Number> getPresentedCountProjects() {
