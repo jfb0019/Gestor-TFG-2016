@@ -237,8 +237,8 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 				Calendar assignmentDate = Calendar.getInstance();
 				assignmentDate.setTime((Date) currentProject.get(0));
 				Calendar startDate = Calendar.getInstance();
-				startDate.set(year, Integer.parseInt(config.getSetting("mesInicio")),
-						Integer.parseInt(config.getSetting("diaInicio")));
+				startDate.set(year, Integer.parseInt(config.getSetting("inicioCurso.mes")),
+						Integer.parseInt(config.getSetting("inicioCurso.dia")));
 				int totalDays = (int) currentProject.get(2);
 				int totalYearNumber = totalDays / 360;
 
@@ -291,8 +291,8 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		presentedDate.setTime((Date) project.get(1));
 
 		Calendar startDate = Calendar.getInstance();
-		startDate.set(presentedDate.get(Calendar.YEAR), Calendar.OCTOBER, 1);
-
+		startDate.set(presentedDate.get(Calendar.YEAR), Integer.parseInt(config.getSetting("finPresentaciones.mes")),
+				Integer.parseInt(config.getSetting("finPresentaciones.dia")));
 		if (presentedDate.getTime().before(startDate.getTime())) {
 			if (presentedProjects.containsKey(presentedDate.get(Calendar.YEAR))) {
 				List<List<Object>> aux = presentedProjects.get(presentedDate.get(Calendar.YEAR));
