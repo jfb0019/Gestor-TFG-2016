@@ -3,6 +3,8 @@ package ubu.digit.ui.views;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -151,8 +153,8 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 					student3 = "";
 				else
 					numStudents++;
-				String assignmentDate = result.getString("FechaAsignacion");
-				String presentationDate = result.getString(FECHA_PRESENTACION);
+				String assignmentDate = transformDateToYMD(result.getString("FechaAsignacion"));
+				String presentationDate = transformDateToYMD(result.getString(FECHA_PRESENTACION));
 				String score = result.getString("Nota");
 				int totalDays = result.getShort(TOTAL_DIAS);
 
@@ -163,6 +165,19 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		} catch (SQLException e) {
 			LOGGER.error("Error en históricos", e);
 		}
+	}
+
+	private String transformDateToYMD(String string) {
+		SimpleDateFormat dmy = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat ymd = new SimpleDateFormat("yyyy/MM/dd");
+		Date date = null;
+		try {
+			date = dmy.parse(string);
+		}
+		catch (ParseException e) {
+			LOGGER.error("Error parsing dates", e);
+		}
+		return ymd.format(date);
 	}
 
 	private void createGlobalMetrics() {
