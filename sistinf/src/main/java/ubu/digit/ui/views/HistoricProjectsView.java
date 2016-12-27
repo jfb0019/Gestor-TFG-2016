@@ -37,6 +37,7 @@ import ubu.digit.ui.components.NavigationBar;
 import ubu.digit.ui.listeners.OrSimpleStringFilterListener;
 import ubu.digit.ui.listeners.SimpleStringFilterListener;
 import ubu.digit.util.ExternalProperties;
+import static ubu.digit.util.Constants.*;
 
 public class HistoricProjectsView extends VerticalLayout implements View {
 
@@ -54,8 +55,6 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 	private SistInfData fachadaDatos;
 
 	private ExternalProperties config;
-
-	private String estiloTitulo;
 
 	private Table table;
 
@@ -81,34 +80,9 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 
 	private TextField presentationDateFilter;
 
-	private static final String TITULO = "Titulo";
-
-	private static final String HISTORICO = "Historico";
-
-	private static final String TOTAL_DIAS = "TotalDias";
-
-	private static final String FECHA_PRESENTACION = "FechaPresentacion";
-
-	private static final String TITLE = "title";
-
-	private static final String NUM_STUDENTS = "numStudents";
-
-	private static final String TUTOR1 = "tutor1";
-
-	private static final String TUTOR2 = "tutor2";
-
-	private static final String TUTOR3 = "tutor3";
-
-	private static final String SCORE = "score";
-
-	private static final String ASSIGNMENT_DATE = "assignmentDate";
-
-	private static final String PRESENTATION_DATE = "presentationDate";
-
 	public HistoricProjectsView() {
 		fachadaDatos = SistInfData.getInstance();
 		config = ExternalProperties.getInstance("/WEB-INF/classes/config.properties", false);
-		estiloTitulo = "lbl-title";
 		formatter = NumberFormat.getInstance();
 		formatter.setMaximumFractionDigits(2);
 		setMargin(true);
@@ -134,28 +108,28 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 			while (result.next()) {
 				int numStudents = 1;
 				String title = result.getString(TITULO);
-				String description = result.getString("Descripcion");
-				String tutor1 = result.getString("Tutor1");
-				String tutor2 = result.getString("Tutor2");
+				String description = result.getString(DESCRIPCION);
+				String tutor1 = result.getString(TUTOR1);
+				String tutor2 = result.getString(TUTOR2);
 				if (tutor2 == null)
 					tutor2 = "";
-				String tutor3 = result.getString("Tutor3");
+				String tutor3 = result.getString(TUTOR3);
 				if (tutor3 == null)
 					tutor3 = "";
-				String student1 = result.getString("Alumno1");
-				String student2 = result.getString("Alumno2");
+				String student1 = result.getString(ALUMNO1);
+				String student2 = result.getString(ALUMNO2);
 				if (student2 == null)
 					student2 = "";
 				else
 					numStudents++;
-				String student3 = result.getString("Alumno3");
+				String student3 = result.getString(ALUMNO3);
 				if (student3 == null)
 					student3 = "";
 				else
 					numStudents++;
-				String assignmentDate = transformDateToYMD(result.getString("FechaAsignacion"));
+				String assignmentDate = transformDateToYMD(result.getString(FECHA_ASIGNACION));
 				String presentationDate = transformDateToYMD(result.getString(FECHA_PRESENTACION));
-				String score = result.getString("Nota");
+				String score = result.getString(NOTA);
 				int totalDays = result.getShort(TOTAL_DIAS);
 
 				HistoricProjectBean bean = new HistoricProjectBean(title, description, tutor1, tutor2, tutor3, student1,
@@ -181,21 +155,21 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 	}
 
 	private void createGlobalMetrics() {
-		Label metricsTitle = new Label("Métricas");
-		metricsTitle.setStyleName(estiloTitulo);
+		Label metricsTitle = new Label(INFO_ESTADISTICA);
+		metricsTitle.setStyleName(TITLE_STYLE);
 		addComponent(metricsTitle);
 		try {
 			Number totalProjectsNumber = fachadaDatos.getTotalNumber(TITULO, HISTORICO);
 			Label totalProjects = new Label("Número total de proyectos: " + totalProjectsNumber.intValue());
 
-			String[] studentColumnNames = { "Alumno1", "Alumno2", "Alumno3" };
+			String[] studentColumnNames = { ALUMNO1, ALUMNO2, ALUMNO3 };
 			Number totalStudentNumber = fachadaDatos.getTotalNumber(studentColumnNames, HISTORICO);
 			Label totalStudents = new Label("Número total de alumnos: " + totalStudentNumber.intValue());
 
-			Number avgScore = fachadaDatos.getAvgColumn("Nota", HISTORICO);
-			Number minScore = fachadaDatos.getMinColumn("Nota", HISTORICO);
-			Number maxScore = fachadaDatos.getMaxColumn("Nota", HISTORICO);
-			Number stdvScore = fachadaDatos.getStdvColumn("Nota", HISTORICO);
+			Number avgScore = fachadaDatos.getAvgColumn(NOTA, HISTORICO);
+			Number minScore = fachadaDatos.getMinColumn(NOTA, HISTORICO);
+			Number maxScore = fachadaDatos.getMaxColumn(NOTA, HISTORICO);
+			Number stdvScore = fachadaDatos.getStdvColumn(NOTA, HISTORICO);
 			List<String> scores = new ArrayList<>();
 			scores.add(formatter.format(avgScore));
 			scores.add(formatter.format(minScore));
@@ -232,8 +206,8 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		yearOfProjects = new HashMap<>();
 		for (int year = minYear; year < maxYear + 1; year++) {
 			try {
-				yearOfProjects.put(year, fachadaDatos.getProjectsCurso("FechaAsignacion", FECHA_PRESENTACION,
-						TOTAL_DIAS, "Nota", HISTORICO, year));
+				yearOfProjects.put(year, fachadaDatos.getProjectsCurso(FECHA_ASIGNACION, FECHA_PRESENTACION,
+						TOTAL_DIAS, NOTA, HISTORICO, year));
 			} catch (SQLException e) {
 				LOGGER.error("Error en historicos", e);
 			}
@@ -530,8 +504,8 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 	}
 
 	private void createFilters() {
-		Label filtersTitle = new Label("Filtros");
-		filtersTitle.setStyleName(estiloTitulo);
+		Label filtersTitle = new Label(FILTROS);
+		filtersTitle.setStyleName(TITLE_STYLE);
 		addComponent(filtersTitle);
 
 		HorizontalLayout filters = new HorizontalLayout();
@@ -554,8 +528,8 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 	}
 
 	private void createHistoricProjectsTable() {
-		Label projectsTitle = new Label("Descripción de proyectos");
-		projectsTitle.setStyleName(estiloTitulo);
+		Label projectsTitle = new Label(DESCRIPCION_PROYECTOS);
+		projectsTitle.setStyleName(TITLE_STYLE);
 		addComponent(projectsTitle);
 
 		table = new Table();

@@ -22,6 +22,7 @@ import ubu.digit.ui.components.Footer;
 import ubu.digit.ui.components.NavigationBar;
 import ubu.digit.ui.listeners.OrSimpleStringFilterListener;
 import ubu.digit.ui.listeners.SimpleStringFilterListener;
+import static ubu.digit.util.Constants.*;
 
 public class ActiveProjectsView extends VerticalLayout implements View {
 
@@ -40,8 +41,6 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 
 	private Table table;
 
-	private String estiloTitulo;
-
 	private TextField projectFilter;
 
 	private TextField descriptionFilter;
@@ -52,31 +51,8 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 
 	private TextField courseFilter;
 
-	private static final String TITULO = "Titulo";
-
-	private static final String PROYECTO = "Proyecto";
-
-	private static final String TITLE = "title";
-
-	private static final String DESCRIPTION = "description";
-
-	private static final String TUTOR1 = "tutor1";
-
-	private static final String TUTOR2 = "tutor2";
-
-	private static final String TUTOR3 = "tutor3";
-
-	private static final String STUDENT1 = "student1";
-
-	private static final String STUDENT2 = "student2";
-
-	private static final String STUDENT3 = "student3";
-
-	private static final String COURSE_ASSIGNMENT = "courseAssignment";
-
 	public ActiveProjectsView() {
 		fachadaDatos = SistInfData.getInstance();
-		estiloTitulo = "lbl-title";
 		setMargin(true);
 		setSpacing(true);
 
@@ -98,22 +74,22 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 		try (ResultSet result = fachadaDatos.getResultSet(PROYECTO, TITULO)) {
 			while (result.next()) {
 				String title = result.getString(TITULO);
-				String description = result.getString("Descripcion");
-				String tutor1 = result.getString("Tutor1");
-				String tutor2 = result.getString("Tutor2");
+				String description = result.getString(DESCRIPCION);
+				String tutor1 = result.getString(TUTOR1);
+				String tutor2 = result.getString(TUTOR2);
 				if (tutor2 == null)
 					tutor2 = "";
-				String tutor3 = result.getString("Tutor3");
+				String tutor3 = result.getString(TUTOR3);
 				if (tutor3 == null)
 					tutor3 = "";
-				String student1 = result.getString("Alumno1");
-				String student2 = result.getString("Alumno2");
+				String student1 = result.getString(ALUMNO1);
+				String student2 = result.getString(ALUMNO2);
 				if (student2 == null)
 					student2 = "";
-				String student3 = result.getString("Alumno3");
+				String student3 = result.getString(ALUMNO3);
 				if (student3 == null)
 					student3 = "";
-				String courseAssignment = result.getString("CursoAsignacion");
+				String courseAssignment = result.getString(CURSO_ASIGNACION);
 
 				ActiveProjectBean bean = new ActiveProjectBean(title, description, tutor1, tutor2, tutor3, student1,
 						student2, student3, courseAssignment);
@@ -125,7 +101,7 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 	}
 
 	private void createMetrics() {
-		Label metricsTitle = new Label("Información estadística");
+		Label metricsTitle = new Label(INFO_ESTADISTICA);
 		metricsTitle.setStyleName("lbl-title");
 		addComponent(metricsTitle);
 
@@ -137,10 +113,10 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 			Label totalFreeProject = new Label(
 					"- Número total de proyectos sin asignar: " + totalFreeProjectNumber.intValue());
 
-			Number totalStudentNumber = fachadaDatos.getTotalNumber("ApellidosNombre", "Alumno");
+			Number totalStudentNumber = fachadaDatos.getTotalNumber(APELLIDOS_NOMBRE, ALUMNO);
 			Label totalStudent = new Label("- Número total de alumnos: " + totalStudentNumber.intValue());
 
-			String[] tutorColumnNames = { "Tutor1", "Tutor2", "Tutor3" };
+			String[] tutorColumnNames = { TUTOR1, TUTOR2, TUTOR3 };
 			Number totalTutorNumber = fachadaDatos.getTotalNumber(tutorColumnNames, PROYECTO);
 			Label totalTutor = new Label("- Número total de tutores involucrados: " + totalTutorNumber.intValue());
 
@@ -151,8 +127,8 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 	}
 
 	private void createFilters() {
-		Label filtersTitle = new Label("Filtros");
-		filtersTitle.setStyleName(estiloTitulo);
+		Label filtersTitle = new Label(FILTROS);
+		filtersTitle.setStyleName(TITLE_STYLE);
 		addComponent(filtersTitle);
 
 		HorizontalLayout filters = new HorizontalLayout();
@@ -178,8 +154,8 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 	}
 
 	private void createCurrentProjectsTable() {
-		Label proyectosTitle = new Label("Descripción de proyectos");
-		proyectosTitle.setStyleName(estiloTitulo);
+		Label proyectosTitle = new Label(DESCRIPCION_PROYECTOS);
+		proyectosTitle.setStyleName(TITLE_STYLE);
 		addComponent(proyectosTitle);
 
 		table = new Table();

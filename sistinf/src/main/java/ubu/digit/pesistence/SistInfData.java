@@ -23,6 +23,8 @@ import org.apache.log4j.Logger;
 import com.vaadin.server.VaadinService;
 
 import ubu.digit.util.ExternalProperties;
+import static ubu.digit.util.Constants.*;
+
 
 /**
  * Fachada Singleton de acceso a datos a través de un recurso
@@ -47,6 +49,7 @@ public class SistInfData implements Serializable {
 	private static final String DISTINTO_DE_VACIO = " != ''";
 	private static final String AND = " and ";
 	private static final String LIKE = " like ";
+	private static final String ORDER_BY = " order by ";
 
 	/**
 	 * 
@@ -297,7 +300,7 @@ public class SistInfData implements Serializable {
 	 */
 	public Number getQuartilColumn(String columnName, String tableName, double percent) throws SQLException {
 		Number nTotalValue = getTotalNumber(columnName, tableName);
-		String sql = SELECT + columnName + FROM + tableName + WHERE + columnName + DISTINTO_DE_VACIO + " order by "
+		String sql = SELECT + columnName + FROM + tableName + WHERE + columnName + DISTINTO_DE_VACIO + ORDER_BY
 				+ columnName;
 		List<Double> listValues = getListNumber(columnName, sql);
 		int indexMedian = (int) (nTotalValue.intValue() * percent);
@@ -425,7 +428,7 @@ public class SistInfData implements Serializable {
 	 * @throws SQLException
 	 */
 	public Number getTotalFreeProject() throws SQLException {
-		String sql = SELECT + COUNT + "(*)" + FROM + "Proyecto" + WHERE + "Alumno1" + LIKE + "'%Aal%'";
+		String sql = SELECT + COUNT + "(*)" + FROM + "Proyecto" + WHERE + ALUMNO1 + LIKE + "'%Aal%'";
 		return getResultSetNumber(sql);
 	}
 
@@ -578,9 +581,10 @@ public class SistInfData implements Serializable {
 		Statement statement = connection.createStatement();
 		List<Object> lista;
 		List<List<Object>> resultados = new ArrayList<>();
-		String sql = SELECT + columnName + "," + columnName2 + "," + columnName3 + "," + columnName4
-				+ ", Alumno1, Alumno2, Alumno3, Tutor1, Tutor2, Tutor3 from " + tableName + WHERE + columnName + LIKE
-				+ "'%" + curso + "';";
+		String sql = SELECT + columnName + "," + columnName2 + "," + columnName3 + "," + columnName4 + ", " 
+				+ ALUMNO1 + ", " + ALUMNO2 + ", " + ALUMNO3 + ", " 
+				+ TUTOR1 + ", " + TUTOR2 + ", " + TUTOR3 + FROM + tableName
+				+ WHERE + columnName + LIKE + "'%" + curso + "';";
 		ResultSet result = statement.executeQuery(sql);
 		while (result.next()) {
 			lista = new ArrayList<>();
@@ -592,12 +596,12 @@ public class SistInfData implements Serializable {
 			lista.add(result.getInt(columnName3));
 			// Nota
 			lista.add(result.getDouble(columnName4));
-			lista.add(result.getString("Alumno1"));
-			lista.add(result.getString("Alumno2"));
-			lista.add(result.getString("Alumno3"));
-			lista.add(result.getString("Tutor1"));
-			lista.add(result.getString("Tutor2"));
-			lista.add(result.getString("Tutor3"));
+			lista.add(result.getString(ALUMNO1));
+			lista.add(result.getString(ALUMNO2));
+			lista.add(result.getString(ALUMNO3));
+			lista.add(result.getString(TUTOR1));
+			lista.add(result.getString(TUTOR2));
+			lista.add(result.getString(TUTOR3));
 			resultados.add(lista);
 		}
 		result.close();
