@@ -18,6 +18,7 @@ import com.vaadin.ui.VerticalLayout;
 
 import ubu.digit.ui.views.UploadCsvView;
 import ubu.digit.util.ExternalProperties;
+import static ubu.digit.util.Constants.*;
 
 public class Footer extends CustomComponent {
 
@@ -48,8 +49,8 @@ public class Footer extends CustomComponent {
 		information.setMargin(false);
 		information.setSpacing(true);
 
-		Label subtitle = new Label("Información");
-		subtitle.setStyleName("lbl-info");
+		Label subtitle = new Label(INFORMACIÓN);
+		subtitle.setStyleName(SUBTITLE_STYLE);
 
 		Label version2 = new Label("Versión 2.0 creada por Javier de la Fuente Barrios");
 		Link link2 = new Link("jfb0019@alu.ubu.es", new ExternalResource("mailto:jfb0019@alu.ubu.es"));

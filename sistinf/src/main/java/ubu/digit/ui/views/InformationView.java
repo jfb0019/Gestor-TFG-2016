@@ -20,10 +20,9 @@ import ubu.digit.pesistence.SistInfData;
 import ubu.digit.ui.components.Footer;
 import ubu.digit.ui.components.NavigationBar;
 import ubu.digit.util.ExternalProperties;
+import static ubu.digit.util.Constants.*;
 
 public class InformationView extends VerticalLayout implements View {
-
-	private static final String DESCRIPCION = "Descripcion";
 
 	private static final long serialVersionUID = 7820866989198327219L;
 
@@ -36,17 +35,11 @@ public class InformationView extends VerticalLayout implements View {
 
 	private SistInfData fachadaDatos;
 
-	private String estiloTitulo;
-
-	private String lineaBlanco;
-	
 	public static final String VIEW_NAME = "information";
 
 	public InformationView() {
 		fachadaDatos = SistInfData.getInstance();
 		config = ExternalProperties.getInstance("/WEB-INF/classes/config.properties", false);
-		estiloTitulo = "lbl-title";
-		lineaBlanco = "&nbsp;";
 
 		setMargin(true);
 		setSpacing(true);
@@ -64,8 +57,8 @@ public class InformationView extends VerticalLayout implements View {
 	}
 	
 	private void createTribunal() {
-		Label tribunalTitle = new Label("Tribunal");
-		tribunalTitle.setStyleName(estiloTitulo);
+		Label tribunalTitle = new Label(MIEMBROS_DEL_TRIBUNAL);
+		tribunalTitle.setStyleName(TITLE_STYLE);
 
 		final HorizontalLayout horizontalTribunal = new HorizontalLayout();
 		horizontalTribunal.setSpacing(true);
@@ -79,10 +72,10 @@ public class InformationView extends VerticalLayout implements View {
 		tribunal.setSpacing(true);
 		tribunal.setWidth(350, Unit.PIXELS);
 
-		try (ResultSet result = fachadaDatos.getResultSet("Tribunal", "NombreApellidos")) {
+		try (ResultSet result = fachadaDatos.getResultSet(TRIBUNAL, NOMBRE_APELLIDOS)) {
 			while (result.next()) {
-				String cargo = result.getString("Cargo");
-				String nombre = result.getString("NombreApellidos");
+				String cargo = result.getString(CARGO);
+				String nombre = result.getString(NOMBRE_APELLIDOS);
 				String filaTribunal = cargo + ": " + nombre;
 				tribunal.addComponent(new Label(filaTribunal));
 			}
@@ -98,14 +91,14 @@ public class InformationView extends VerticalLayout implements View {
 	}
 
 	private void createNormas() {
-		addComponent(new Label(lineaBlanco, ContentMode.HTML));
-		Label normasTitle = new Label("Especificaciones de Entrega");
-		normasTitle.setStyleName(estiloTitulo);
+		addComponent(new Label(WHITE_LINE, ContentMode.HTML));
+		Label normasTitle = new Label(ESPECIFICACIONES_DE_ENTREGA);
+		normasTitle.setStyleName(TITLE_STYLE);
 
 		final VerticalLayout normas = new VerticalLayout();
 		normas.setSpacing(true);
 
-		try (ResultSet result = fachadaDatos.getResultSet("Norma", DESCRIPCION)) {
+		try (ResultSet result = fachadaDatos.getResultSet(NORMA, DESCRIPCION)) {
 			while (result.next()) {
 				String descripcion = result.getString(DESCRIPCION);
 				normas.addComponent(new Label(" - " + descripcion));
@@ -117,9 +110,9 @@ public class InformationView extends VerticalLayout implements View {
 	}
 
 	private void createCalendar() {
-		addComponent(new Label(lineaBlanco, ContentMode.HTML));
-		Label fechasTitle = new Label("Fechas de entrega");
-		fechasTitle.setStyleName(estiloTitulo);
+		addComponent(new Label(WHITE_LINE, ContentMode.HTML));
+		Label fechasTitle = new Label(FECHAS_DE_ENTREGA);
+		fechasTitle.setStyleName(TITLE_STYLE);
 
 		String urlCalendario = config.getSetting("urlCalendario");
 		BrowserFrame calendar = new BrowserFrame("", new ExternalResource("https://" + urlCalendario));
@@ -129,14 +122,14 @@ public class InformationView extends VerticalLayout implements View {
 	}
 
 	private void createDocumentos() {
-		addComponent(new Label(lineaBlanco, ContentMode.HTML));
-		Label documentosTitle = new Label("Documentos");
-		documentosTitle.setStyleName(estiloTitulo);
+		addComponent(new Label(WHITE_LINE, ContentMode.HTML));
+		Label documentosTitle = new Label(DOCUMENTOS);
+		documentosTitle.setStyleName(TITLE_STYLE);
 
 		final VerticalLayout documentos = new VerticalLayout();
 		documentos.setSpacing(true);
 
-		try (ResultSet result = fachadaDatos.getResultSet("Documento", DESCRIPCION)) {
+		try (ResultSet result = fachadaDatos.getResultSet(DOCUMENTO, DESCRIPCION)) {
 			while (result.next()) {
 				String descripcion = result.getString(DESCRIPCION);
 				String url = result.getString("Url");
@@ -148,7 +141,7 @@ public class InformationView extends VerticalLayout implements View {
 			LOGGER.error("Error en documentos", e);
 		}
 		addComponents(documentosTitle, documentos);
-		addComponent(new Label(lineaBlanco, ContentMode.HTML));
+		addComponent(new Label(WHITE_LINE, ContentMode.HTML));
 	}
 
 	@Override

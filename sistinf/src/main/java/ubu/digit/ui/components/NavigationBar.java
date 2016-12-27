@@ -10,6 +10,7 @@ import ubu.digit.ui.views.ActiveProjectsView;
 import ubu.digit.ui.views.InformationView;
 import ubu.digit.ui.views.MetricsView;
 import ubu.digit.ui.views.HistoricProjectsView;
+import static ubu.digit.util.Constants.*;
 
 import com.vaadin.ui.Button.ClickEvent;
 
@@ -20,14 +21,12 @@ public class NavigationBar extends CustomComponent {
 	 */
 	private static final long serialVersionUID = -3164191122994765469L;
 
-	private Button botonInfo;
-	private Button botonActive;
-	private Button botonHistory;
-	private Button botonMetrics;
+	private Button buttonInfo;
+	private Button buttonActive;
+	private Button buttonHistory;
+	private Button buttonMetrics;
 
 	private Navigator navigator;
-
-	private static final String BUTTON_HEIGHT = "64px";
 
 	public NavigationBar() {
 		HorizontalLayout content = new HorizontalLayout();
@@ -36,31 +35,31 @@ public class NavigationBar extends CustomComponent {
 		content.setWidth("100%");
 
 		inicializarComponentes();
-		content.addComponents(botonInfo, botonActive, botonHistory, botonMetrics);
+		content.addComponents(buttonInfo, buttonActive, buttonHistory, buttonMetrics);
 		setCompositionRoot(content);
 	}
 
 	private void inicializarComponentes() {
 		navigator = UI.getCurrent().getNavigator();
 
-		botonInfo = new Button("Información");
-		botonInfo.addClickListener(new ButtonClick());
-		botonActive = new Button("Proyectos activos");
-		botonActive.addClickListener(new ButtonClick());
-		botonHistory = new Button("Histórico");
-		botonHistory.addClickListener(new ButtonClick());
-		botonMetrics = new Button("Métricas");
-		botonMetrics.addClickListener(new ButtonClick());
+		buttonInfo = new Button(INFORMACIÓN);
+		buttonInfo.addClickListener(new ButtonClick());
+		buttonActive = new Button(PROYECTOS_ACTIVOS);
+		buttonActive.addClickListener(new ButtonClick());
+		buttonHistory = new Button(PROYECTOS_HISTÓRICOS);
+		buttonHistory.addClickListener(new ButtonClick());
+		buttonMetrics = new Button(MÉTRICAS);
+		buttonMetrics.addClickListener(new ButtonClick());
 
-		botonInfo.setHeight(BUTTON_HEIGHT);
-		botonActive.setHeight(BUTTON_HEIGHT);
-		botonHistory.setHeight(BUTTON_HEIGHT);
-		botonMetrics.setHeight(BUTTON_HEIGHT);
+		buttonInfo.setHeight(BUTTON_HEIGHT);
+		buttonActive.setHeight(BUTTON_HEIGHT);
+		buttonHistory.setHeight(BUTTON_HEIGHT);
+		buttonMetrics.setHeight(BUTTON_HEIGHT);
 
-		botonInfo.setWidth("100%");
-		botonActive.setWidth("100%");
-		botonHistory.setWidth("100%");
-		botonMetrics.setWidth("100%");
+		buttonInfo.setWidth("100%");
+		buttonActive.setWidth("100%");
+		buttonHistory.setWidth("100%");
+		buttonMetrics.setWidth("100%");
 	}
 
 	private class ButtonClick implements Button.ClickListener {
@@ -68,16 +67,15 @@ public class NavigationBar extends CustomComponent {
 
 		@Override
 		public void buttonClick(ClickEvent event) {
-			if (event.getButton() == botonInfo) {
+			if (event.getButton() == buttonInfo) {
 				navigator.navigateTo(InformationView.VIEW_NAME);
-			} else if (event.getButton() == botonActive) {
+			} else if (event.getButton() == buttonActive) {
 				navigator.navigateTo(ActiveProjectsView.VIEW_NAME);
-			} else if (event.getButton() == botonHistory) {
+			} else if (event.getButton() == buttonHistory) {
 				navigator.navigateTo(HistoricProjectsView.VIEW_NAME);
-			} else if (event.getButton() == botonMetrics) {
+			} else if (event.getButton() == buttonMetrics) {
 				navigator.navigateTo(MetricsView.VIEW_NAME);
 			}
-
 		}
 	}
 }

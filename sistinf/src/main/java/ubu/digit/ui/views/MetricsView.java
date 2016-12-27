@@ -4,12 +4,14 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.VerticalLayout;
 
 import ubu.digit.ui.components.Footer;
 import ubu.digit.ui.components.NavigationBar;
 import ubu.digit.util.ExternalProperties;
+import static ubu.digit.util.Constants.*;
 
 public class MetricsView extends VerticalLayout implements View {
 
@@ -33,6 +35,10 @@ public class MetricsView extends VerticalLayout implements View {
 	}
 
 	private void addSonarImageLink(){
+		Label metricsTitle = new Label(MÉTRICAS);
+		metricsTitle.setStyleName(TITLE_STYLE);
+		addComponent(metricsTitle);
+		
 		String urlSonar = config.getSetting("urlSonar");
 		Link sonarLink = new Link(null, new ExternalResource("https://" + urlSonar));
 		sonarLink.setIcon(new ThemeResource("img/tfgsonar.png"));
