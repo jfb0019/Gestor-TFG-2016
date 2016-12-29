@@ -2,10 +2,6 @@ package ubu.digit.util;
 
 public final class Constants {
 
-	public Constants() {
-		// Se restringe la instanciación
-	}
-
 	// CSV TABLES
 	public static final String TRIBUNAL = "tribunal";
 	public static final String NORMA = "norma";
@@ -53,10 +49,10 @@ public final class Constants {
 	public static final String BUTTON_HEIGHT = "64px";
 
 	// LABELS
-	public static final String INFORMACIÓN = "Información";
+	public static final String INFORMACION = "Información";
 	public static final String PROYECTOS_ACTIVOS = "Proyectos activos";
-	public static final String PROYECTOS_HISTÓRICOS = "Histórico";
-	public static final String MÉTRICAS = "Métricas";
+	public static final String PROYECTOS_HISTORICOS = "Histórico";
+	public static final String METRICAS = "Métricas";
 	public static final String INFO_ESTADISTICA = "Información estadística";
 	public static final String FILTROS = "Filtros";
 	public static final String DESCRIPCION_PROYECTOS = "Descripción de proyectos";
@@ -64,4 +60,9 @@ public final class Constants {
 	public static final String ESPECIFICACIONES_DE_ENTREGA = "Especificaciones de Entrega";
 	public static final String FECHAS_DE_ENTREGA = "Fechas de Entrega";
 	public static final String DOCUMENTOS = "Documentos";
+
+	private Constants() {
+		// Se restringe la instanciación
+	}
+
 }

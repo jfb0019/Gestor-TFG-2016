@@ -35,7 +35,7 @@ public class MetricsView extends VerticalLayout implements View {
 	}
 
 	private void addSonarImageLink(){
-		Label metricsTitle = new Label(MÉTRICAS);
+		Label metricsTitle = new Label(METRICAS);
 		metricsTitle.setStyleName(TITLE_STYLE);
 		addComponent(metricsTitle);
 		

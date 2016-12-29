@@ -42,13 +42,13 @@ public class NavigationBar extends CustomComponent {
 	private void inicializarComponentes() {
 		navigator = UI.getCurrent().getNavigator();
 
-		buttonInfo = new Button(INFORMACIÓN);
+		buttonInfo = new Button(INFORMACION);
 		buttonInfo.addClickListener(new ButtonClick());
 		buttonActive = new Button(PROYECTOS_ACTIVOS);
 		buttonActive.addClickListener(new ButtonClick());
-		buttonHistory = new Button(PROYECTOS_HISTÓRICOS);
+		buttonHistory = new Button(PROYECTOS_HISTORICOS);
 		buttonHistory.addClickListener(new ButtonClick());
-		buttonMetrics = new Button(MÉTRICAS);
+		buttonMetrics = new Button(METRICAS);
 		buttonMetrics.addClickListener(new ButtonClick());
 
 		buttonInfo.setHeight(BUTTON_HEIGHT);

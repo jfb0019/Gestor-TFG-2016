@@ -50,7 +50,7 @@ public class Footer extends CustomComponent {
 		information.setMargin(false);
 		information.setSpacing(true);
 
-		Label subtitle = new Label(INFORMACIÓN);
+		Label subtitle = new Label(INFORMACION);
 		subtitle.setStyleName(SUBTITLE_STYLE);
 
 		Label version2 = new Label("Versión 2.0 creada por Javier de la Fuente Barrios");

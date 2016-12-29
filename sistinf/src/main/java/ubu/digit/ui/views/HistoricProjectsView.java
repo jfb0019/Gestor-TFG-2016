@@ -448,7 +448,7 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 	}
 
 	private Map<Integer, Number> geProjectsCount(Map<Integer, List<List<Object>>> projects) {
-		Map<Integer, Number> projectsCount = new HashMap<Integer, Number>();
+		Map<Integer, Number> projectsCount = new HashMap<>();
 		for (int year = minYear; year <= maxYear; year++) {
 			int totalProjects = 0;
 			if (projects.containsKey(year))

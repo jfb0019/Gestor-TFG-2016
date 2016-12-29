@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.apache.log4j.Logger;
+
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.VaadinService;
@@ -35,6 +37,8 @@ import com.vaadin.ui.VerticalLayout;
 public class UploadCsvView extends VerticalLayout implements View {
 
 	private static final long serialVersionUID = 8460171059055033456L;
+
+	private static final Logger LOGGER = Logger.getLogger(UploadCsvView.class);
 
 	public static final String VIEW_NAME = "upload";
 
@@ -99,15 +103,17 @@ public class UploadCsvView extends VerticalLayout implements View {
 	class CsvReceiver implements Receiver, StartedListener, ProgressListener, FinishedListener, SucceededListener,
 			FailedListener {
 		private static final long serialVersionUID = -1414096228596596894L;
+		private transient FileOutputStream fos;
 
 		@Override
 		public OutputStream receiveUpload(String filename, String mimeType) {
-			FileOutputStream fos = null;
+			fos = null;
 			File file;
 			try {
 				file = new File(completeDir + filename);
 				fos = new FileOutputStream(file);
 			} catch (FileNotFoundException e) {
+				LOGGER.error("Error en CsvReceiver", e);
 				return new NullOutputStream();
 			}
 			return fos;
@@ -116,6 +122,7 @@ public class UploadCsvView extends VerticalLayout implements View {
 		private class NullOutputStream extends OutputStream {
 			@Override
 			public void write(int b) throws IOException {
+				// Null output stream to write to nowhere
 			}
 		}
 
@@ -149,6 +156,7 @@ public class UploadCsvView extends VerticalLayout implements View {
 		@Override
 		public void uploadFinished(FinishedEvent event) {
 			state.setValue("Idle");
+			closeResources();
 		}
 
 		@Override
@@ -162,6 +170,16 @@ public class UploadCsvView extends VerticalLayout implements View {
 			File file = new File(completeDir + event.getFilename());
 			if (file.exists())
 				file.delete();
+		}
+
+		private void closeResources() {
+			if (fos != null) {
+				try {
+					fos.close();
+				} catch (IOException e) {
+					LOGGER.error("Error en uploadcsv", e);
+				}
+			}
 		}
 	}
 
