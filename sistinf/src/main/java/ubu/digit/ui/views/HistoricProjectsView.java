@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -32,13 +31,14 @@ import com.vaadin.ui.VerticalLayout;
 
 import ubu.digit.pesistence.SistInfData;
 import ubu.digit.ui.beans.HistoricProjectBean;
+import ubu.digit.ui.columngenerators.TutorsColumnGenerator;
 import ubu.digit.ui.components.Footer;
 import ubu.digit.ui.components.NavigationBar;
 import ubu.digit.ui.listeners.OrSimpleStringFilterListener;
 import ubu.digit.ui.listeners.SimpleStringFilterListener;
 import ubu.digit.util.ExternalProperties;
 import static ubu.digit.util.Constants.*;
-
+	
 public class HistoricProjectsView extends VerticalLayout implements View {
 
 	private static final long serialVersionUID = 8431807779365780674L;
@@ -538,19 +538,21 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		table.setPageLength(10);
 		table.setColumnCollapsingAllowed(true);
 		table.setContainerDataSource(beans);
-		table.setVisibleColumns(TITLE, TUTOR1, TUTOR2, TUTOR3, NUM_STUDENTS, ASSIGNMENT_DATE, PRESENTATION_DATE, SCORE);
-
+		addGeneratedColumns();
+		table.setVisibleColumns(TITLE, TUTORS, NUM_STUDENTS, ASSIGNMENT_DATE, PRESENTATION_DATE, SCORE);
 		setTableColumnHeaders();
 		setColumnExpandRatios();
-		collapseOptionalFields();
 		showDescriptionOnClick();
 	}
 
+	private void addGeneratedColumns(){
+		table.addGeneratedColumn(TUTORS, new TutorsColumnGenerator());
+		
+	}
+	
 	private void setTableColumnHeaders() {
 		table.setColumnHeader(TITLE, "Título");
-		table.setColumnHeader(TUTOR1, "Tutor 1");
-		table.setColumnHeader(TUTOR2, "Tutor 2");
-		table.setColumnHeader(TUTOR3, "Tutor 3");
+		table.setColumnHeader(TUTORS, "Tutor/es");
 		table.setColumnHeader(NUM_STUDENTS, "Nº Alumnos");
 		table.setColumnHeader(ASSIGNMENT_DATE, "Fecha Asignación");
 		table.setColumnHeader(PRESENTATION_DATE, "Fecha Presentación");
@@ -559,34 +561,11 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 
 	private void setColumnExpandRatios() {
 		table.setColumnExpandRatio(TITLE, 35);
-		table.setColumnExpandRatio(TUTOR1, 10);
-		table.setColumnExpandRatio(TUTOR2, 10);
-		table.setColumnExpandRatio(TUTOR3, 10);
-		table.setColumnExpandRatio(NUM_STUDENTS, 5);
-		table.setColumnExpandRatio(ASSIGNMENT_DATE, 7);
-		table.setColumnExpandRatio(PRESENTATION_DATE, 8);
+		table.setColumnExpandRatio(TUTORS, 9);
+		table.setColumnExpandRatio(NUM_STUDENTS, 4);
+		table.setColumnExpandRatio(ASSIGNMENT_DATE, 6);
+		table.setColumnExpandRatio(PRESENTATION_DATE, 6);
 		table.setColumnExpandRatio(SCORE, 3);
-	}
-
-	private void collapseOptionalFields() {
-		List<HistoricProjectBean> itemIds = beans.getItemIds();
-		Iterator<HistoricProjectBean> iterator = itemIds.iterator();
-		boolean tutor2Flag = true;
-		boolean tutor3Flag = true;
-
-		while (iterator.hasNext()) {
-			HistoricProjectBean next = iterator.next();
-			HistoricProjectBean bean = beans.getItem(next).getBean();
-			if (!"".equals(bean.getTutor2()))
-				tutor2Flag = false;
-			if (!"".equals(bean.getTutor3()))
-				tutor3Flag = false;
-		}
-
-		if (tutor2Flag)
-			table.setColumnCollapsed(TUTOR2, true);
-		if (tutor3Flag)
-			table.setColumnCollapsed(TUTOR3, true);
 	}
 
 	private void showDescriptionOnClick() {

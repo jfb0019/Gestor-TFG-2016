@@ -2,8 +2,6 @@ package ubu.digit.ui.views;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -18,6 +16,8 @@ import com.vaadin.ui.VerticalLayout;
 
 import ubu.digit.pesistence.SistInfData;
 import ubu.digit.ui.beans.ActiveProjectBean;
+import ubu.digit.ui.columngenerators.StudentsColumnGenerator;
+import ubu.digit.ui.columngenerators.TutorsColumnGenerator;
 import ubu.digit.ui.components.Footer;
 import ubu.digit.ui.components.NavigationBar;
 import ubu.digit.ui.listeners.OrSimpleStringFilterListener;
@@ -161,71 +161,38 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 		table = new Table();
 		addComponent(table);
 		table.setWidth("100%");
-		table.setPageLength(9);
+		table.setPageLength(5);
 		table.setColumnCollapsingAllowed(true);
 		table.setContainerDataSource(beans);
-		table.setVisibleColumns(TITLE, DESCRIPTION, TUTOR1, TUTOR2, TUTOR3, STUDENT1, STUDENT2, STUDENT3,
-				COURSE_ASSIGNMENT);
+		addGeneratedColumns();
+		table.setVisibleColumns(TITLE, DESCRIPTION, TUTORS, STUDENTS, COURSE_ASSIGNMENT);
 
 		setTableColumnHeaders();
 		setColumnExpandRatios();
-		collapseOptionalFields();
 	}
 
+	private void addGeneratedColumns(){
+		table.addGeneratedColumn(TUTORS, new TutorsColumnGenerator());
+		table.addGeneratedColumn(STUDENTS, new StudentsColumnGenerator());
+		
+	}
+	
 	private void setTableColumnHeaders() {
 		table.setColumnHeader(TITLE, "Título");
 		table.setColumnHeader(DESCRIPTION, "Descripción");
-		table.setColumnHeader(TUTOR1, "Tutor 1");
-		table.setColumnHeader(TUTOR2, "Tutor 2");
-		table.setColumnHeader(TUTOR3, "Tutor 3");
-		table.setColumnHeader(STUDENT1, "Alumno 1");
-		table.setColumnHeader(STUDENT2, "Alumno 2");
-		table.setColumnHeader(STUDENT3, "Alumno 3");
+		table.setColumnHeader(TUTORS, "Tutor/es");
+		table.setColumnHeader(STUDENTS, "Alumno/s");
 		table.setColumnHeader(COURSE_ASSIGNMENT, "Curso Asignación");
 	}
 
 	private void setColumnExpandRatios() {
 		table.setColumnExpandRatio(TITLE, 5);
 		table.setColumnExpandRatio(DESCRIPTION, 17);
-		table.setColumnExpandRatio(TUTOR1, 3);
-		table.setColumnExpandRatio(TUTOR2, 3);
-		table.setColumnExpandRatio(TUTOR3, 3);
-		table.setColumnExpandRatio(STUDENT1, 3);
-		table.setColumnExpandRatio(STUDENT2, 3);
-		table.setColumnExpandRatio(STUDENT3, 3);
+		table.setColumnExpandRatio(TUTORS, 6);
+		table.setColumnExpandRatio(STUDENTS, 6);
 		table.setColumnExpandRatio(COURSE_ASSIGNMENT, 3);
 	}
 
-	private void collapseOptionalFields() {
-		List<ActiveProjectBean> itemIds = beans.getItemIds();
-		Iterator<ActiveProjectBean> iterator = itemIds.iterator();
-		boolean student2Flag = true;
-		boolean student3Flag = true;
-		boolean tutor2Flag = true;
-		boolean tutor3Flag = true;
-
-		while (iterator.hasNext()) {
-			ActiveProjectBean next = iterator.next();
-			ActiveProjectBean bean = beans.getItem(next).getBean();
-			if (!"".equals(bean.getStudent2()))
-				student2Flag = false;
-			if (!"".equals(bean.getStudent3()))
-				student3Flag = false;
-			if (!"".equals(bean.getTutor2()))
-				tutor2Flag = false;
-			if (!"".equals(bean.getTutor3()))
-				tutor3Flag = false;
-		}
-
-		if (student2Flag)
-			table.setColumnCollapsed(STUDENT2, true);
-		if (student3Flag)
-			table.setColumnCollapsed(STUDENT3, true);
-		if (tutor2Flag)
-			table.setColumnCollapsed(TUTOR2, true);
-		if (tutor3Flag)
-			table.setColumnCollapsed(TUTOR3, true);
-	}
 
 	private void addFiltersListeners() {
 		projectFilter.addTextChangeListener(new SimpleStringFilterListener(table, TITLE));

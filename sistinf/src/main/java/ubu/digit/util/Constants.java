@@ -43,6 +43,8 @@ public final class Constants {
 	public static final String SCORE = "score";
 	public static final String ASSIGNMENT_DATE = "assignmentDate";
 	public static final String PRESENTATION_DATE = "presentationDate";
+	public static final String STUDENTS = "students";
+	public static final String TUTORS = "tutors";
 
 	// CSS / OTHER
 	public static final String WHITE_LINE = "&nbsp;";

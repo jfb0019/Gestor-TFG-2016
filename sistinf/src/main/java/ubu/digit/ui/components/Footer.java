@@ -15,6 +15,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Button.ClickEvent;
 
 import ubu.digit.ui.views.UploadCsvView;
 import ubu.digit.util.ExternalProperties;
@@ -105,8 +106,17 @@ public class Footer extends CustomComponent {
 		}
 
 		Button login = new Button("Actualizar");
-		login.addClickListener(e -> UI.getCurrent().getNavigator().navigateTo(UploadCsvView.VIEW_NAME));
+		login.addClickListener(new LoginClickListener());
 		license.addComponent(login);
 		content.addComponent(license);
+	}
+
+	private final class LoginClickListener implements Button.ClickListener {
+		private static final long serialVersionUID = -861788921350517735L;
+	
+		@Override
+		public void buttonClick(ClickEvent event) {
+			 UI.getCurrent().getNavigator().navigateTo(UploadCsvView.VIEW_NAME);				
+		}
 	}
 }

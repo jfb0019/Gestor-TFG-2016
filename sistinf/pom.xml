@@ -24,9 +24,9 @@
 			"cdn" -->
 		<vaadin.widgetset.mode>local</vaadin.widgetset.mode>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	  	<sonar.junit.reportsPath>target/surefire-reports</sonar.junit.reportsPath>
-	  	<sonar.cobertura.reportPath>target/site/cobertura/coverage.xml</sonar.cobertura.reportPath>
-	  	<sonar.host.url>http://prueba-ubugii.rhcloud.com/</sonar.host.url>
+		<sonar.junit.reportsPath>target/surefire-reports</sonar.junit.reportsPath>
+		<sonar.cobertura.reportPath>target/site/cobertura/coverage.xml</sonar.cobertura.reportPath>
+		<sonar.host.url>http://prueba-ubugii.rhcloud.com/</sonar.host.url>
 	</properties>
 
 	<repositories>
@@ -202,9 +202,7 @@
 						<ignores>
 							<ignore>org.apache.log4j.Logger.*</ignore>
 						</ignores>
-						<!-- <excludes>
-							<exclude>**/SistInfUI.class</exclude>
-						</excludes>  -->
+						<!-- <excludes> <exclude>**/SistInfUI.class</exclude> </excludes> -->
 					</instrumentation>
 				</configuration>
 				<executions>
@@ -218,6 +216,15 @@
 				</executions>
 			</plugin>
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.sonarsource.scanner.maven</groupId>
+					<artifactId>sonar-maven-plugin</artifactId>
+					<version>3.1.1</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 
 	<profiles>
