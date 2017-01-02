@@ -168,8 +168,12 @@ public class UploadCsvView extends VerticalLayout implements View {
 		public void uploadFailed(FailedEvent event) {
 			state.setValue("Subida de fichero " + event.getFilename() + " fallida");
 			File file = new File(completeDir + event.getFilename());
-			if (file.exists())
-				file.delete();
+			if (file.exists()) {
+				boolean deleted = file.delete();
+				if (!deleted) {
+					LOGGER.error("Fichero " + file.getName() + " no borrado correctamente");
+				}
+			}
 		}
 
 		private void closeResources() {

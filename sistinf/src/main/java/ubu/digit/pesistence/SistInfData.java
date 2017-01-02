@@ -145,16 +145,14 @@ public class SistInfData implements Serializable {
 		Number number = 0;
 		boolean hasResults;
 
-		try {
-			Statement statement = connection.createStatement();
+		try (Statement statement = connection.createStatement()) {
 			hasResults = statement.execute(sql);
 
 			if (hasResults) {
-				ResultSet result = statement.getResultSet();
-				result.next();
-				number = result.getFloat(1);
-				result.close();
-				statement.close();
+				try (ResultSet result = statement.getResultSet()) {
+					result.next();
+					number = result.getFloat(1);
+				}
 			}
 		} catch (SQLException e) {
 			LOGGER.error(e);
@@ -237,19 +235,18 @@ public class SistInfData implements Serializable {
 	 * @return Listado con los datos de dicha columna.
 	 */
 	private List<Float> obtenerDatos(String columnName, String tableName) throws SQLException {
-		Statement statement = connection.createStatement();
 		String sql = SELECT + columnName + FROM + tableName + ";";
-		ResultSet result = statement.executeQuery(sql);
-		ResultSetMetaData rmeta = result.getMetaData();
-		int numColumns = rmeta.getColumnCount();
 		List<Float> media = new ArrayList<>();
-		while (result.next()) {
-			for (int i = 1; i <= numColumns; ++i) {
-				media.add(result.getFloat(i));
+		try (Statement statement = connection.createStatement(); 
+				ResultSet result = statement.executeQuery(sql)) {
+			ResultSetMetaData rmeta = result.getMetaData();
+			int numColumns = rmeta.getColumnCount();
+			while (result.next()) {
+				for (int i = 1; i <= numColumns; ++i) {
+					media.add(result.getFloat(i));
+				}
 			}
 		}
-		result.close();
-		statement.close();
 		return media;
 	}
 
@@ -294,6 +291,7 @@ public class SistInfData implements Serializable {
 	 *            nombre de la columna
 	 * @param tableName
 	 *            nombre de la tabla de datos
+	 * @param percent
 	 * @return mediana
 	 * @throws SQLException
 	 * @throws SQLException
@@ -317,17 +315,28 @@ public class SistInfData implements Serializable {
 	 */
 	private List<Double> getListNumber(String columnName, String sql) throws SQLException {
 		List<Double> listValues = new ArrayList<>(100);
-		Statement statement = connection.createStatement();
-		Boolean hasResults = statement.execute(sql);
-		if (hasResults) {
-			ResultSet result = statement.getResultSet();
-			while (result.next()) {
-				listValues.add(result.getDouble(columnName));
+		try (Statement statement = connection.createStatement()) {
+			Boolean hasResults = statement.execute(sql);
+			if (hasResults) {
+				try (ResultSet result = statement.getResultSet()) {
+					addNumbersToList(columnName, listValues, result);
+				}
 			}
-			result.close();
-			statement.close();
 		}
 		return listValues;
+	}
+
+	/**
+	 * 
+	 * @param columnName
+	 * @param listValues
+	 * @param result
+	 * @throws SQLException
+	 */
+	private void addNumbersToList(String columnName, List<Double> listValues, ResultSet result) throws SQLException {
+		while (result.next()) {
+			listValues.add(result.getDouble(columnName));
+		}
 	}
 
 	/**
@@ -378,25 +387,18 @@ public class SistInfData implements Serializable {
 	 * @throws SQLException
 	 */
 	public Number getTotalNumber(String[] columnsName, String tableName) throws SQLException {
-		ResultSet resultSet = null;
-		Statement statement = null;
 		String sql;
 		Set<String> noDups = new HashSet<>();
 		if (columnsName != null) {
 			for (int i = 0; i < columnsName.length; i++) {
 				sql = SELECT + columnsName[i] + FROM + tableName + WHERE + columnsName[i] + DISTINTO_DE_VACIO;
-				statement = connection.createStatement();
-				resultSet = statement.executeQuery(sql);
-				ResultSetMetaData rmeta = resultSet.getMetaData();
-				int numColumns = rmeta.getColumnCount();
-				while (resultSet.next()) {
-					addUniqueStrings(resultSet, noDups, numColumns);
+				try (Statement statement = connection.createStatement();
+						ResultSet resultSet = statement.executeQuery(sql)) {
+					ResultSetMetaData rmeta = resultSet.getMetaData();
+					int numColumns = rmeta.getColumnCount();
+					addUniqueStrings(noDups, resultSet, numColumns);
 				}
 			}
-			if (resultSet != null)
-				resultSet.close();
-			if (statement != null)
-				statement.close();
 			return (float) noDups.size();
 		} else {
 			return 0;
@@ -414,9 +416,11 @@ public class SistInfData implements Serializable {
 	 *            número de columnas que tiene el resultset
 	 * @throws SQLException
 	 */
-	private void addUniqueStrings(ResultSet resultSet, Set<String> noDups, int numColumns) throws SQLException {
-		for (int j = 1; j <= numColumns; ++j) {
-			noDups.add(resultSet.getString(j));
+	private void addUniqueStrings(Set<String> noDups, ResultSet resultSet, int numColumns) throws SQLException {
+		while (resultSet.next()) {
+			for (int j = 1; j <= numColumns; ++j) {
+				noDups.add(resultSet.getString(j));
+			}
 		}
 	}
 
@@ -537,19 +541,18 @@ public class SistInfData implements Serializable {
 	 * @throws SQLException
 	 */
 	public Date getYear(String columnName, String tableName, Boolean minimo) throws SQLException {
-		Statement statement = connection.createStatement();
 		String sql = SELECT + columnName + FROM + tableName + ";";
-		ResultSet result = statement.executeQuery(sql);
-		ResultSetMetaData rmeta = result.getMetaData();
-		int numColumns = rmeta.getColumnCount();
 		List<Date> listadoFechas = new ArrayList<>();
-		while (result.next()) {
-			for (int i = 1; i <= numColumns; ++i) {
-				listadoFechas.add(transform(result.getString(i)));
+		try (Statement statement = connection.createStatement(); 
+				ResultSet result = statement.executeQuery(sql)) {
+			ResultSetMetaData rmeta = result.getMetaData();
+			int numColumns = rmeta.getColumnCount();
+			while (result.next()) {
+				for (int i = 1; i <= numColumns; ++i) {
+					listadoFechas.add(transform(result.getString(i)));
+				}
 			}
 		}
-		result.close();
-		statement.close();
 		if (minimo) {
 			return Collections.min(listadoFechas);
 		} else {
@@ -578,34 +581,33 @@ public class SistInfData implements Serializable {
 	 */
 	public List<List<Object>> getProjectsCurso(String columnName, String columnName2, String columnName3,
 			String columnName4, String tableName, Number curso) throws SQLException {
-		Statement statement = connection.createStatement();
 		List<Object> lista;
 		List<List<Object>> resultados = new ArrayList<>();
 		String sql = SELECT + columnName + "," + columnName2 + "," + columnName3 + "," + columnName4 + ", " 
 				+ ALUMNO1 + ", " + ALUMNO2 + ", " + ALUMNO3 + ", " 
 				+ TUTOR1 + ", " + TUTOR2 + ", " + TUTOR3 + FROM + tableName
 				+ WHERE + columnName + LIKE + "'%" + curso + "';";
-		ResultSet result = statement.executeQuery(sql);
-		while (result.next()) {
-			lista = new ArrayList<>();
-			// Fecha asignación
-			lista.add(transform(result.getString(columnName)));
-			// Fecha presentación
-			lista.add(transform(result.getString(columnName2)));
-			// Dias
-			lista.add(result.getInt(columnName3));
-			// Nota
-			lista.add(result.getDouble(columnName4));
-			lista.add(result.getString(ALUMNO1));
-			lista.add(result.getString(ALUMNO2));
-			lista.add(result.getString(ALUMNO3));
-			lista.add(result.getString(TUTOR1));
-			lista.add(result.getString(TUTOR2));
-			lista.add(result.getString(TUTOR3));
-			resultados.add(lista);
+		try (Statement statement = connection.createStatement(); 
+				ResultSet result = statement.executeQuery(sql)) {
+			while (result.next()) {
+				lista = new ArrayList<>();
+				// Fecha asignación
+				lista.add(transform(result.getString(columnName)));
+				// Fecha presentación
+				lista.add(transform(result.getString(columnName2)));
+				// Dias
+				lista.add(result.getInt(columnName3));
+				// Nota
+				lista.add(result.getDouble(columnName4));
+				lista.add(result.getString(ALUMNO1));
+				lista.add(result.getString(ALUMNO2));
+				lista.add(result.getString(ALUMNO3));
+				lista.add(result.getString(TUTOR1));
+				lista.add(result.getString(TUTOR2));
+				lista.add(result.getString(TUTOR3));
+				resultados.add(lista);
+			}
 		}
-		result.close();
-		statement.close();
 		return resultados;
 	}
 
