@@ -27,6 +27,7 @@ public final class Constants {
 	public static final String FECHA_PRESENTACION = "fechaPresentacion";
 	public static final String TOTAL_DIAS = "totalDias";
 	public static final String NOTA = "nota";
+	public static final String ENLACE_REPOSITORIO = "enlaceRepositorio";
 
 	// BEAN FIELDS NAMES
 	public static final String TITLE = "title";
@@ -41,6 +42,7 @@ public final class Constants {
 	public static final String PRESENTATION_DATE = "presentationDate";
 	public static final String STUDENTS = "students";
 	public static final String TUTORS = "tutors";
+	public static final String PROJECTS = "projects";
 
 	// CSS / OTHER
 	public static final String WHITE_LINE = "&nbsp;";

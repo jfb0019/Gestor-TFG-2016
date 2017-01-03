@@ -31,6 +31,7 @@ import com.vaadin.ui.VerticalLayout;
 
 import ubu.digit.pesistence.SistInfData;
 import ubu.digit.ui.beans.HistoricProjectBean;
+import ubu.digit.ui.columngenerators.ProjectsColumnGenerator;
 import ubu.digit.ui.columngenerators.TutorsColumnGenerator;
 import ubu.digit.ui.components.Footer;
 import ubu.digit.ui.components.NavigationBar;
@@ -131,9 +132,12 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 				String presentationDate = transformDateToYMD(result.getString(FECHA_PRESENTACION));
 				String score = result.getString(NOTA);
 				int totalDays = result.getShort(TOTAL_DIAS);
+				String repoLink = result.getString(ENLACE_REPOSITORIO);
+				if(repoLink == null)
+					repoLink = "";
 
 				HistoricProjectBean bean = new HistoricProjectBean(title, description, tutor1, tutor2, tutor3, student1,
-						student2, student3, numStudents, assignmentDate, presentationDate, score, totalDays);
+						student2, student3, numStudents, assignmentDate, presentationDate, score, totalDays, repoLink);
 				beans.addBean(bean);
 			}
 		} catch (SQLException e) {
@@ -539,7 +543,7 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		table.setColumnCollapsingAllowed(true);
 		table.setContainerDataSource(beans);
 		addGeneratedColumns();
-		table.setVisibleColumns(TITLE, TUTORS, NUM_STUDENTS, ASSIGNMENT_DATE, PRESENTATION_DATE, SCORE);
+		table.setVisibleColumns(PROJECTS, TUTORS, NUM_STUDENTS, ASSIGNMENT_DATE, PRESENTATION_DATE, SCORE);
 		setTableColumnHeaders();
 		setColumnExpandRatios();
 		showDescriptionOnClick();
@@ -547,11 +551,12 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 
 	private void addGeneratedColumns(){
 		table.addGeneratedColumn(TUTORS, new TutorsColumnGenerator());
+		table.addGeneratedColumn(PROJECTS, new ProjectsColumnGenerator());
 		
 	}
 	
 	private void setTableColumnHeaders() {
-		table.setColumnHeader(TITLE, "Título");
+		table.setColumnHeader(PROJECTS, "Título");
 		table.setColumnHeader(TUTORS, "Tutor/es");
 		table.setColumnHeader(NUM_STUDENTS, "Nº Alumnos");
 		table.setColumnHeader(ASSIGNMENT_DATE, "Fecha Asignación");
@@ -560,7 +565,7 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 	}
 
 	private void setColumnExpandRatios() {
-		table.setColumnExpandRatio(TITLE, 35);
+		table.setColumnExpandRatio(PROJECTS, 35);
 		table.setColumnExpandRatio(TUTORS, 9);
 		table.setColumnExpandRatio(NUM_STUDENTS, 4);
 		table.setColumnExpandRatio(ASSIGNMENT_DATE, 6);
