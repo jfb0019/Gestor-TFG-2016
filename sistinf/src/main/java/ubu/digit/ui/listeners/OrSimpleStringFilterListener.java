@@ -32,9 +32,10 @@ public class OrSimpleStringFilterListener implements TextChangeListener {
 	public void textChange(TextChangeEvent event) {
 		Filterable f = (Filterable) table.getContainerDataSource();
 		
-		if (filter != null)
+		if (filter != null) {
 			f.removeContainerFilter(filter);
-		
+		}
+
 		filter = new Or(new SimpleStringFilter(propertyId1, event.getText(), true, false),
 				new SimpleStringFilter(propertyId2, event.getText(), true, false),
 				new SimpleStringFilter(propertyId3, event.getText(), true, false));

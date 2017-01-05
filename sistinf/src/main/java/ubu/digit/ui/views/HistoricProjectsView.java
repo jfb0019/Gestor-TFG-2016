@@ -1,5 +1,6 @@
 package ubu.digit.ui.views;
 
+import java.awt.Color;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.NumberFormat;
@@ -13,6 +14,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.LineAndShapeRenderer;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.vaadin.addon.JFreeChartWrapper;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -112,29 +123,34 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 				String description = result.getString(DESCRIPCION);
 				String tutor1 = result.getString(TUTOR1);
 				String tutor2 = result.getString(TUTOR2);
-				if (tutor2 == null)
+				if (tutor2 == null) {
 					tutor2 = "";
+				}
 				String tutor3 = result.getString(TUTOR3);
-				if (tutor3 == null)
+				if (tutor3 == null) {
 					tutor3 = "";
+				}
 				String student1 = result.getString(ALUMNO1);
 				String student2 = result.getString(ALUMNO2);
-				if (student2 == null)
+				if (student2 == null) {
 					student2 = "";
-				else
+				} else {
 					numStudents++;
+				}
 				String student3 = result.getString(ALUMNO3);
-				if (student3 == null)
+				if (student3 == null) {
 					student3 = "";
-				else
+				} else {
 					numStudents++;
+				}
 				String assignmentDate = transformDateToYMD(result.getString(FECHA_ASIGNACION));
 				String presentationDate = transformDateToYMD(result.getString(FECHA_PRESENTACION));
 				String score = result.getString(NOTA);
 				int totalDays = result.getShort(TOTAL_DIAS);
 				String repoLink = result.getString(ENLACE_REPOSITORIO);
-				if(repoLink == null)
+				if (repoLink == null) {
 					repoLink = "";
+				}
 
 				HistoricProjectBean bean = new HistoricProjectBean(title, description, tutor1, tutor2, tutor3, student1,
 						student2, student3, numStudents, assignmentDate, presentationDate, score, totalDays, repoLink);
@@ -372,16 +388,31 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		List<String> scores = new ArrayList<>();
 		List<String> days = new ArrayList<>();
 		List<String> months = new ArrayList<>();
-
+		
+		List<String> courses = new ArrayList<>();
+		List<Number> avgScores = new ArrayList<>();
+		List<Number> avgMonths = new ArrayList<>();
+		
 		for (int year = minYear; year <= maxYear; year++) {
 			scores.add(formatter.format(averageScores.get(year)));
 			days.add(formatter.format(averageTotalDays.get(year)));
 			months.add(formatter.format(averageMonths.get(year)));
+			courses.add(year - 1 + "/" + year);
+			avgScores.add(averageScores.get(year));
+			avgMonths.add(averageMonths.get(year));
 		}
 
 		addComponent(new Label("Media de notas por curso: " + scores));
 		addComponent(new Label("Media de dias por curso: " + days));
 		addComponent(new Label("Media de meses por curso: " + months));
+		
+		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+		for (int i = 0; i < courses.size(); i++) {
+			dataset.addValue(avgScores.get(i), "Nota", courses.get(i));
+			dataset.addValue(avgMonths.get(i), "Nº meses", courses.get(i));
+		}
+		createChart(dataset);
 	}
 
 	private Map<Integer, Number> getAverageScores() {
@@ -449,6 +480,34 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		Label allCourses = new Label("Cursos: " + courses);
 		addComponents(asignedYearlyProjects, presentedYearlyProjects, asignedYearlyStudents, asignedYearlyTutors,
 				asignedOldProjects, allCourses);
+		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+		for (int i = 0; i < courses.size(); i++) {
+			dataset.addValue(yearlyAssignedProjects.get(i), "Proyectos Asignados", courses.get(i));
+			dataset.addValue(yearlyPresentedProjects.get(i), "Proyectos Presentados", courses.get(i));
+			dataset.addValue(yearlyAssignedStudents.get(i), "Alumnos Asignados", courses.get(i));
+			dataset.addValue(yearlyAssignedTutors.get(i), "Tutores Asignados", courses.get(i));
+			dataset.addValue(yearlyOldProjects.get(i), "Proyectos Ya Asignados", courses.get(i));
+		}
+
+		createChart(dataset);
+	}
+
+	private void createChart(DefaultCategoryDataset dataset) {
+		JFreeChart chart = ChartFactory.createLineChart("Métricas agrupadas por curso", "Curso", "Nº", dataset,
+				PlotOrientation.VERTICAL, true, true, false);
+		chart.setBackgroundPaint(Color.white);
+		CategoryPlot plot = (CategoryPlot) chart.getPlot();
+		plot.setBackgroundPaint(Color.white);
+		plot.setRangeGridlinePaint(Color.gray);
+		plot.setRenderer(new LineAndShapeRenderer());
+
+		CategoryAxis domainAxis = chart.getCategoryPlot().getDomainAxis();
+		domainAxis.setCategoryLabelPositions(CategoryLabelPositions.DOWN_45);
+		NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+		rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+		JFreeChartWrapper chartWrapper = new JFreeChartWrapper(chart);
+		addComponent(chartWrapper);
 	}
 
 	private Map<Integer, Number> geProjectsCount(Map<Integer, List<List<Object>>> projects) {

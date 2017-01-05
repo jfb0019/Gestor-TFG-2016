@@ -77,18 +77,22 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 				String description = result.getString(DESCRIPCION);
 				String tutor1 = result.getString(TUTOR1);
 				String tutor2 = result.getString(TUTOR2);
-				if (tutor2 == null)
+				if (tutor2 == null) {
 					tutor2 = "";
+				}
 				String tutor3 = result.getString(TUTOR3);
-				if (tutor3 == null)
+				if (tutor3 == null) {
 					tutor3 = "";
+				}
 				String student1 = result.getString(ALUMNO1);
 				String student2 = result.getString(ALUMNO2);
-				if (student2 == null)
+				if (student2 == null) {
 					student2 = "";
+				}
 				String student3 = result.getString(ALUMNO3);
-				if (student3 == null)
+				if (student3 == null) {
 					student3 = "";
+				}
 				String courseAssignment = result.getString(CURSO_ASIGNACION);
 
 				ActiveProjectBean bean = new ActiveProjectBean(title, description, tutor1, tutor2, tutor3, student1,

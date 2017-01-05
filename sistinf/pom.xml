@@ -130,6 +130,13 @@
 			<version>1.6.5</version>
 			<scope>test</scope>
 		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.vaadin.addon/jfreechartwrapper -->
+		<dependency>
+			<groupId>org.vaadin.addon</groupId>
+			<artifactId>jfreechartwrapper</artifactId>
+			<version>3.0.4</version>
+		</dependency>	
 	</dependencies>
 
 	<build>

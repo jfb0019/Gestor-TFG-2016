@@ -24,10 +24,11 @@ public class SimpleStringFilterListener implements TextChangeListener {
 	@Override
 	public void textChange(TextChangeEvent event) {
 		Filterable f = (Filterable) table.getContainerDataSource();
-		
-		if (filter != null)
+
+		if (filter != null) {
 			f.removeContainerFilter(filter);
-		
+		}
+
 		filter = new SimpleStringFilter(propertyId, (String) event.getText(), true, false);
 		f.addContainerFilter(filter);
 	}
