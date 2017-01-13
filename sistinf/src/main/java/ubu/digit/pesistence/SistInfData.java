@@ -543,14 +543,10 @@ public class SistInfData implements Serializable {
 	public Date getYear(String columnName, String tableName, Boolean minimo) throws SQLException {
 		String sql = SELECT + columnName + FROM + tableName + ";";
 		List<Date> listadoFechas = new ArrayList<>();
-		try (Statement statement = connection.createStatement(); 
+		try (Statement statement = connection.createStatement();
 				ResultSet result = statement.executeQuery(sql)) {
-			ResultSetMetaData rmeta = result.getMetaData();
-			int numColumns = rmeta.getColumnCount();
 			while (result.next()) {
-				for (int i = 1; i <= numColumns; ++i) {
-					listadoFechas.add(transform(result.getString(i)));
-				}
+				listadoFechas.add(transform(result.getString(columnName)));
 			}
 		}
 		if (minimo) {

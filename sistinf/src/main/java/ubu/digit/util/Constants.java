@@ -3,11 +3,11 @@ package ubu.digit.util;
 public final class Constants {
 
 	// CSV TABLES
-	public static final String TRIBUNAL = "tribunal";
-	public static final String NORMA = "norma";
-	public static final String DOCUMENTO = "documento";
-	public static final String PROYECTO = "proyecto";
-	public static final String HISTORICO = "historico";
+	public static final String TRIBUNAL = "Tribunal";
+	public static final String NORMA = "Norma";
+	public static final String DOCUMENTO = "Documento";
+	public static final String PROYECTO = "Proyecto";
+	public static final String HISTORICO = "Historico";
 
 	// CSV COLUMNS
 	public static final String CARGO = "cargo";
