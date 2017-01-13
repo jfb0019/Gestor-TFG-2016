@@ -1,6 +1,7 @@
 package ubu.digit.ui.beans;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 public class HistoricProjectBean extends ProjectBean implements Serializable {
 
@@ -8,9 +9,9 @@ public class HistoricProjectBean extends ProjectBean implements Serializable {
 
 	private int numStudents;
 
-	private String assignmentDate;
+	private LocalDate assignmentDate;
 
-	private String presentationDate;
+	private LocalDate presentationDate;
 
 	private String score;
 
@@ -23,8 +24,8 @@ public class HistoricProjectBean extends ProjectBean implements Serializable {
 	}
 
 	public HistoricProjectBean(String title, String description, String tutor1, String tutor2, String tutor3,
-			String student1, String student2, String student3, int numStudents, String assignmentDate,
-			String presentationDate, String score, int totalDays, String repositoryLink) {
+			String student1, String student2, String student3, int numStudents, LocalDate assignmentDate,
+			LocalDate presentationDate, String score, int totalDays, String repositoryLink) {
 		this.title = title;
 		this.description = description;
 		this.tutor1 = tutor1;
@@ -49,19 +50,19 @@ public class HistoricProjectBean extends ProjectBean implements Serializable {
 		this.numStudents = numStudents;
 	}
 
-	public String getAssignmentDate() {
+	public LocalDate getAssignmentDate() {
 		return assignmentDate;
 	}
 
-	public void setAssignmentDate(String assignmentDate) {
+	public void setAssignmentDate(LocalDate assignmentDate) {
 		this.assignmentDate = assignmentDate;
 	}
 
-	public String getPresentationDate() {
+	public LocalDate getPresentationDate() {
 		return presentationDate;
 	}
 
-	public void setPresentationDate(String presentationDate) {
+	public void setPresentationDate(LocalDate presentationDate) {
 		this.presentationDate = presentationDate;
 	}
 

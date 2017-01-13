@@ -4,11 +4,9 @@ import java.awt.Color;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +70,8 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 
 	private NumberFormat numberFormatter;
 	
+	private DateTimeFormatter dateTimeFormatter;
+	
 	private transient Map<Integer, List<List<Object>>> yearOfProjects;
 
 	private transient Map<Integer, List<List<Object>>> newProjects;
@@ -97,6 +97,7 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		config = ExternalProperties.getInstance("/WEB-INF/classes/config.properties", false);
 		numberFormatter = NumberFormat.getInstance();
 		numberFormatter.setMaximumFractionDigits(2);
+		dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		
 		setMargin(true);
 		setSpacing(true);
@@ -144,8 +145,8 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 				} else {
 					numStudents++;
 				}
-				String assignmentDate = transformDateToYMD(result.getString(FECHA_ASIGNACION));
-				String presentationDate = transformDateToYMD(result.getString(FECHA_PRESENTACION));
+				LocalDate assignmentDate = LocalDate.parse(result.getString(FECHA_ASIGNACION), dateTimeFormatter);
+				LocalDate presentationDate = LocalDate.parse(result.getString(FECHA_PRESENTACION), dateTimeFormatter);
 				String score = result.getString(NOTA);
 				int totalDays = result.getShort(TOTAL_DIAS);
 				String repoLink = result.getString(ENLACE_REPOSITORIO);
@@ -160,19 +161,6 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		} catch (SQLException e) {
 			LOGGER.error("Error en históricos", e);
 		}
-	}
-
-	private String transformDateToYMD(String string) {
-		SimpleDateFormat dmy = new SimpleDateFormat("dd/MM/yyyy");
-		SimpleDateFormat ymd = new SimpleDateFormat("yyyy/MM/dd");
-		Date date = null;
-		try {
-			date = dmy.parse(string);
-		}
-		catch (ParseException e) {
-			LOGGER.error("Error parsing dates", e);
-		}
-		return ymd.format(date);
 	}
 
 	private void createGlobalMetrics() {
@@ -244,7 +232,7 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 			List<Object> currentProject;
 			for (int index = 0; index < yearOfProjects.get(year).size(); index++) {
 				currentProject = yearOfProjects.get(year).get(index);
-				LocalDate assignmentDate= (LocalDate) currentProject.get(0);
+				LocalDate assignmentDate = (LocalDate) currentProject.get(0);
 				LocalDate startDate = LocalDate.of(year, Integer.parseInt(config.getSetting("inicioCurso.mes")),
 						Integer.parseInt(config.getSetting("inicioCurso.dia")));
 				int totalDays = (int) currentProject.get(2);
