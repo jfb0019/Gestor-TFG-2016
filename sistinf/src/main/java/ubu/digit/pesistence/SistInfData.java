@@ -7,12 +7,10 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -540,9 +538,9 @@ public class SistInfData implements Serializable {
 	 * @return Curso más bajo que ha encontrado.
 	 * @throws SQLException
 	 */
-	public Date getYear(String columnName, String tableName, Boolean minimo) throws SQLException {
+	public LocalDate getYear(String columnName, String tableName, Boolean minimo) throws SQLException {
 		String sql = SELECT + columnName + FROM + tableName + ";";
-		List<Date> listadoFechas = new ArrayList<>();
+		List<LocalDate> listadoFechas = new ArrayList<>();
 		try (Statement statement = connection.createStatement();
 				ResultSet result = statement.executeQuery(sql)) {
 			while (result.next()) {
@@ -610,19 +608,14 @@ public class SistInfData implements Serializable {
 	/**
 	 * Transforma el string que le llega en un tipo Date.
 	 * 
-	 * @param g
+	 * @param date
 	 *            Fecha en tipo String
 	 * @return Fecha con formato Date
 	 */
-	private Date transform(String g) {
-		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		Date date = null;
-		try {
-			date = formatter.parse(g);
-		} catch (ParseException e) {
-			LOGGER.error(e);
-		}
-		return date;
+	private LocalDate transform(String date) {
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		LocalDate parsedDate = LocalDate.parse(date, dateTimeFormatter);
+		return parsedDate;
 	}
 
 	/**

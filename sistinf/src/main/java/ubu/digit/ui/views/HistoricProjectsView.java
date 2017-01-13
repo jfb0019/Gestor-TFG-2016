@@ -6,8 +6,8 @@ import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -70,8 +70,8 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 
 	private Table table;
 
-	private NumberFormat formatter;
-
+	private NumberFormat numberFormatter;
+	
 	private transient Map<Integer, List<List<Object>>> yearOfProjects;
 
 	private transient Map<Integer, List<List<Object>>> newProjects;
@@ -95,8 +95,9 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 	public HistoricProjectsView() {
 		fachadaDatos = SistInfData.getInstance();
 		config = ExternalProperties.getInstance("/WEB-INF/classes/config.properties", false);
-		formatter = NumberFormat.getInstance();
-		formatter.setMaximumFractionDigits(2);
+		numberFormatter = NumberFormat.getInstance();
+		numberFormatter.setMaximumFractionDigits(2);
+		
 		setMargin(true);
 		setSpacing(true);
 		
@@ -191,10 +192,10 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 			Number maxScore = fachadaDatos.getMaxColumn(NOTA, HISTORICO);
 			Number stdvScore = fachadaDatos.getStdvColumn(NOTA, HISTORICO);
 			List<String> scores = new ArrayList<>();
-			scores.add(formatter.format(avgScore));
-			scores.add(formatter.format(minScore));
-			scores.add(formatter.format(maxScore));
-			scores.add(formatter.format(stdvScore));
+			scores.add(numberFormatter.format(avgScore));
+			scores.add(numberFormatter.format(minScore));
+			scores.add(numberFormatter.format(maxScore));
+			scores.add(numberFormatter.format(stdvScore));
 			Label scoreStats = new Label("Calificación [media,min,max,stdv]: " + scores);
 
 			Number avgDays = fachadaDatos.getAvgColumn(TOTAL_DIAS, HISTORICO);
@@ -202,10 +203,10 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 			Number maxDays = fachadaDatos.getMaxColumn(TOTAL_DIAS, HISTORICO);
 			Number stdvDays = fachadaDatos.getStdvColumn(TOTAL_DIAS, HISTORICO);
 			List<String> days = new ArrayList<>();
-			days.add(formatter.format(avgDays));
-			days.add(formatter.format(minDays));
-			days.add(formatter.format(maxDays));
-			days.add(formatter.format(stdvDays));
+			days.add(numberFormatter.format(avgDays));
+			days.add(numberFormatter.format(minDays));
+			days.add(numberFormatter.format(maxDays));
+			days.add(numberFormatter.format(stdvDays));
 			Label daysStats = new Label("Tiempo/días [media,min,max,stdv]: " + days);
 
 			addComponents(totalProjects, totalStudents, scoreStats, daysStats);
@@ -221,8 +222,8 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 	}
 
 	private void initProjectsStructures() {
-		minYear = getYearCourse(true).get(Calendar.YEAR);
-		maxYear = getYearCourse(false).get(Calendar.YEAR);
+		minYear = getYearCourse(true).getYear();
+		maxYear = getYearCourse(false).getYear();
 		yearOfProjects = new HashMap<>();
 		for (int year = minYear; year < maxYear + 1; year++) {
 			try {
@@ -243,15 +244,13 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 			List<Object> currentProject;
 			for (int index = 0; index < yearOfProjects.get(year).size(); index++) {
 				currentProject = yearOfProjects.get(year).get(index);
-				Calendar assignmentDate = Calendar.getInstance();
-				assignmentDate.setTime((Date) currentProject.get(0));
-				Calendar startDate = Calendar.getInstance();
-				startDate.set(year, Integer.parseInt(config.getSetting("inicioCurso.mes")),
+				LocalDate assignmentDate= (LocalDate) currentProject.get(0);
+				LocalDate startDate = LocalDate.of(year, Integer.parseInt(config.getSetting("inicioCurso.mes")),
 						Integer.parseInt(config.getSetting("inicioCurso.dia")));
 				int totalDays = (int) currentProject.get(2);
 				int totalYearNumber = totalDays / 360;
 
-				if (assignmentDate.getTime().before(startDate.getTime())) {
+				if (assignmentDate.isBefore(startDate)) {
 					assignProjectCourses(year, currentProject, totalYearNumber, true);
 				} else {
 					assignProjectCourses(year, currentProject, totalYearNumber, false);
@@ -296,21 +295,18 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 	}
 
 	private void buildPresentedProjects(List<Object> project) {
-		Calendar presentedDate = Calendar.getInstance();
-		presentedDate.setTime((Date) project.get(1));
-
-		Calendar startDate = Calendar.getInstance();
-		startDate.set(presentedDate.get(Calendar.YEAR), Integer.parseInt(config.getSetting("finPresentaciones.mes")),
+		LocalDate presentedDate = (LocalDate) project.get(1);
+		LocalDate startDate = LocalDate.of(presentedDate.getYear(), Integer.parseInt(config.getSetting("finPresentaciones.mes")),
 				Integer.parseInt(config.getSetting("finPresentaciones.dia")));
-		if (presentedDate.getTime().before(startDate.getTime())) {
-			if (presentedProjects.containsKey(presentedDate.get(Calendar.YEAR))) {
-				List<List<Object>> aux = presentedProjects.get(presentedDate.get(Calendar.YEAR));
+		if (presentedDate.isBefore(startDate)) {
+			if (presentedProjects.containsKey(presentedDate.getYear())) {
+				List<List<Object>> aux = presentedProjects.get(presentedDate.getYear());
 				aux.add(project);
-				presentedProjects.put(presentedDate.get(Calendar.YEAR), aux);
+				presentedProjects.put(presentedDate.getYear(), aux);
 			} else {
 				List<List<Object>> aux = new ArrayList<>();
 				aux.add(project);
-				presentedProjects.put(presentedDate.get(Calendar.YEAR), aux);
+				presentedProjects.put(presentedDate.getYear(), aux);
 			}
 		}
 	}
@@ -394,9 +390,9 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		List<Number> avgMonths = new ArrayList<>();
 		
 		for (int year = minYear; year <= maxYear; year++) {
-			scores.add(formatter.format(averageScores.get(year)));
-			days.add(formatter.format(averageTotalDays.get(year)));
-			months.add(formatter.format(averageMonths.get(year)));
+			scores.add(numberFormatter.format(averageScores.get(year)));
+			days.add(numberFormatter.format(averageTotalDays.get(year)));
+			months.add(numberFormatter.format(averageMonths.get(year)));
 			courses.add(year - 1 + "/" + year);
 			avgScores.add(averageScores.get(year));
 			avgMonths.add(averageMonths.get(year));
@@ -545,25 +541,23 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		return presented;
 	}
 
-	private Calendar getYearCourse(Boolean isMinimum) {
-		Calendar courseDate = Calendar.getInstance();
-		Long dateTime = null;
+	private LocalDate getYearCourse(Boolean isMinimum) {
+		LocalDate dateTime = null;
 		if (isMinimum) {
 			try {
-				dateTime = fachadaDatos.getYear(FECHA_PRESENTACION, HISTORICO, true).getTime();
+				dateTime = fachadaDatos.getYear(FECHA_PRESENTACION, HISTORICO, true);
 			} catch (SQLException e) {
 				LOGGER.error("Error en obtenerCurso", e);
 			}
 
 		} else {
 			try {
-				dateTime = fachadaDatos.getYear(FECHA_PRESENTACION, HISTORICO, false).getTime();
+				dateTime = fachadaDatos.getYear(FECHA_PRESENTACION, HISTORICO, false);
 			} catch (SQLException e) {
 				LOGGER.error("Error en obtenerCurso", e);
 			}
 		}
-		courseDate.setTimeInMillis(dateTime);
-		return courseDate;
+		return dateTime;
 	}
 
 	private void createFilters() {

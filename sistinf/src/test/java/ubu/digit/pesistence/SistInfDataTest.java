@@ -9,10 +9,8 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -198,18 +196,15 @@ public class SistInfDataTest {
      */
     @Test
     public void testFechas() throws SQLException {
-        Date esperado = sistInfData.getYear("Fecha", "Prueba", true);
-        Calendar g = Calendar.getInstance();
-        g.set(1649, Calendar.JANUARY, 1, 0, 0, 0);
-        Date valor = new Date(g.getTimeInMillis());
+        LocalDate esperado = sistInfData.getYear("Fecha", "Prueba", true);
+        LocalDate valor = LocalDate.of(1649, 1, 1);
 
         assertEqualDates(esperado, valor);
 
-        esperado = sistInfData.getYear("Fecha", "Prueba", false);
-        g.set(2015, Calendar.JANUARY, 1, 0, 0, 0);
-        valor = new Date(g.getTimeInMillis());
+        LocalDate esperado2 = sistInfData.getYear("Fecha", "Prueba", false);
+        LocalDate valor2 = LocalDate.of(2015, 1, 1);
 
-        assertEqualDates(esperado, valor);
+        assertEqualDates(esperado2, valor2);
     }
 
     /**
@@ -220,10 +215,10 @@ public class SistInfDataTest {
      * @param value
      *            Fecha obtenida.
      */
-    private static void assertEqualDates(Date expected, Date value) {
-        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        String strExpected = formatter.format(expected);
-        String strValue = formatter.format(value);
+    private static void assertEqualDates(LocalDate expected, LocalDate value) {
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String strExpected = dateTimeFormatter.format(expected);
+        String strValue = dateTimeFormatter.format(value);
         assertEquals(strExpected, strValue);
     }
 
