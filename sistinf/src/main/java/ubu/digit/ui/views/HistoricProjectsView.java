@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -72,17 +73,17 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 	
 	private DateTimeFormatter dateTimeFormatter;
 	
-	private transient Map<Integer, List<List<Object>>> yearOfProjects;
+	private transient Map<Integer, List<HistoricProjectBean>> yearOfProjects;
 
-	private transient Map<Integer, List<List<Object>>> newProjects;
+	private transient Map<Integer, List<HistoricProjectBean>> newProjects;
 
-	private transient Map<Integer, List<List<Object>>> oldProjects;
+	private transient Map<Integer, List<HistoricProjectBean>> oldProjects;
 
-	private transient Map<Integer, List<List<Object>>> presentedProjects;
+	private transient Map<Integer, List<HistoricProjectBean>> presentedProjects;
 
-	private int minYear;
+	private int minCourse;
 
-	private int maxYear;
+	private int maxCourse;
 
 	private TextField projectFilter;
 
@@ -120,34 +121,49 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		beans = new BeanItemContainer<>(HistoricProjectBean.class);
 		try (ResultSet result = fachadaDatos.getResultSet(HISTORICO, TITULO)) {
 			while (result.next()) {
-				int numStudents = 1;
+				int numStudents = 0;
+				int numTutors = 0;
 				String title = result.getString(TITULO);
 				String description = result.getString(DESCRIPCION);
 				String tutor1 = result.getString(TUTOR1);
+				if (tutor1 == null || "".equals(tutor1)) {
+					tutor1 = "";
+				} else {
+					numTutors++;
+				}
 				String tutor2 = result.getString(TUTOR2);
-				if (tutor2 == null) {
+				if (tutor2 == null || "".equals(tutor2)) {
 					tutor2 = "";
+				} else {
+					numTutors++;
 				}
 				String tutor3 = result.getString(TUTOR3);
-				if (tutor3 == null) {
+				if (tutor3 == null || "".equals(tutor3)) {
 					tutor3 = "";
+				} else {
+					numTutors++;
 				}
 				String student1 = result.getString(ALUMNO1);
+				if (student1 == null || "".equals(student1)) {
+					student1 = "";
+				} else {
+					numStudents++;
+				}
 				String student2 = result.getString(ALUMNO2);
-				if (student2 == null) {
+				if (student2 == null || "".equals(student2)) {
 					student2 = "";
 				} else {
 					numStudents++;
 				}
 				String student3 = result.getString(ALUMNO3);
-				if (student3 == null) {
+				if (student3 == null || "".equals(student3)) {
 					student3 = "";
 				} else {
 					numStudents++;
 				}
 				LocalDate assignmentDate = LocalDate.parse(result.getString(FECHA_ASIGNACION), dateTimeFormatter);
 				LocalDate presentationDate = LocalDate.parse(result.getString(FECHA_PRESENTACION), dateTimeFormatter);
-				String score = result.getString(NOTA);
+				Double score = result.getDouble(NOTA);
 				int totalDays = result.getShort(TOTAL_DIAS);
 				String repoLink = result.getString(ENLACE_REPOSITORIO);
 				if (repoLink == null) {
@@ -155,7 +171,8 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 				}
 
 				HistoricProjectBean bean = new HistoricProjectBean(title, description, tutor1, tutor2, tutor3, student1,
-						student2, student3, numStudents, assignmentDate, presentationDate, score, totalDays, repoLink);
+						student2, student3, numStudents, numTutors, assignmentDate, presentationDate, score, totalDays,
+						repoLink);
 				beans.addBean(bean);
 			}
 		} catch (SQLException e) {
@@ -210,89 +227,94 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 	}
 
 	private void initProjectsStructures() {
-		minYear = getYearCourse(true).getYear();
-		maxYear = getYearCourse(false).getYear();
+		minCourse = getCourse(true).getYear();
+		maxCourse = getCourse(false).getYear();
+
 		yearOfProjects = new HashMap<>();
-		for (int year = minYear; year < maxYear + 1; year++) {
-			try {
-				yearOfProjects.put(year, fachadaDatos.getProjectsCurso(FECHA_ASIGNACION, FECHA_PRESENTACION,
-						TOTAL_DIAS, NOTA, HISTORICO, year));
-			} catch (SQLException e) {
-				LOGGER.error("Error en historicos", e);
+		newProjects = new HashMap<>();
+		oldProjects = new HashMap<>();
+		presentedProjects = new HashMap<>();
+
+		Iterator<HistoricProjectBean> iterator = beans.getItemIds().iterator();
+		while (iterator.hasNext()) {
+			HistoricProjectBean beanId = iterator.next();
+			HistoricProjectBean bean = beans.getItem(beanId).getBean();
+			int year = bean.getAssignmentDate().getYear();
+			if (yearOfProjects.containsKey(year)) {
+				yearOfProjects.get(year).add(bean);
+			} else {
+				List<HistoricProjectBean> aux = new ArrayList<>();
+				aux.add(bean);
+				yearOfProjects.put(year, aux);
 			}
 		}
 		organizeProjects();
 	}
 
 	private void organizeProjects() {
-		newProjects = new HashMap<>();
-		oldProjects = new HashMap<>();
-		presentedProjects = new HashMap<>();
-		for (int year = minYear; year <= maxYear; year++) {
-			List<Object> currentProject;
+		Iterator<Integer> iterator = yearOfProjects.keySet().iterator();
+		while (iterator.hasNext()) {
+			Integer year = iterator.next();
 			for (int index = 0; index < yearOfProjects.get(year).size(); index++) {
-				currentProject = yearOfProjects.get(year).get(index);
-				LocalDate assignmentDate = (LocalDate) currentProject.get(0);
-				LocalDate startDate = LocalDate.of(year, Integer.parseInt(config.getSetting("inicioCurso.mes")),
-						Integer.parseInt(config.getSetting("inicioCurso.dia")));
-				int totalDays = (int) currentProject.get(2);
-				int totalYearNumber = totalDays / 360;
+				HistoricProjectBean project = yearOfProjects.get(year).get(index);
+				LocalDate assignmentDate = project.getAssignmentDate();
+
+				int startMonth = Integer.parseInt(config.getSetting("inicioCurso.mes"));
+				int startDay = Integer.parseInt(config.getSetting("inicioCurso.dia"));
+				LocalDate startDate = LocalDate.of(year, startMonth, startDay);
+			
+				int totalDays = project.getTotalDays();
+				int totalYears = totalDays / 365;
 
 				if (assignmentDate.isBefore(startDate)) {
-					assignProjectCourses(year, currentProject, totalYearNumber, true);
+					assignProjectCourses(year, project, totalYears, true);
 				} else {
-					assignProjectCourses(year, currentProject, totalYearNumber, false);
+					assignProjectCourses(year, project, totalYears, false);
 				}
-				buildPresentedProjects(currentProject);
+				buildPresentedProjects(project);
 			}
 		}
 	}
 
-	private void assignProjectCourses(int year, List<Object> project, int totalYearNumber, boolean currentCourse) {
-		for (int yearCount = 0; yearCount <= totalYearNumber; yearCount++) {
-			assignProject(year, yearCount, project, currentCourse);
+	private void assignProjectCourses(int year, HistoricProjectBean project, int totalYears, boolean isCurrentCourse) {
+		for (int yearCount = 0; yearCount <= totalYears; yearCount++) {
+			assignProject(year, yearCount, project, isCurrentCourse);
 		}
 	}
 
-	private void assignProject(int year, int yearNumber, List<Object> project, boolean isCurrentCourse) {
+	private void assignProject(int year, int yearCount, HistoricProjectBean project, boolean isCurrentCourse) {
 		int before = 0;
 		if (!isCurrentCourse) {
 			before = 1;
 		}
-		if (yearNumber == 0) {
+		if (yearCount == 0) {
 			if (newProjects.containsKey(year + before)) {
-				List<List<Object>> aux = newProjects.get(year + before);
-				aux.add(project);
-				newProjects.put(year + before, aux);
+				newProjects.get(year + before).add(project);
 			} else {
-				List<List<Object>> aux = new ArrayList<>();
+				List<HistoricProjectBean> aux = new ArrayList<>();
 				aux.add(project);
 				newProjects.put(year + before, aux);
 			}
 		} else {
-			if (oldProjects.containsKey(year + yearNumber + before)) {
-				List<List<Object>> aux = oldProjects.get(year + yearNumber + before);
-				aux.add(project);
-				oldProjects.put(year + yearNumber + before, aux);
+			if (oldProjects.containsKey(year + yearCount + before)) {
+				oldProjects.get(year + yearCount + before).add(project);
 			} else {
-				List<List<Object>> aux = new ArrayList<>();
+				List<HistoricProjectBean> aux = new ArrayList<>();
 				aux.add(project);
-				oldProjects.put(year + yearNumber + before, aux);
+				oldProjects.put(year + yearCount + before, aux);
 			}
 		}
 	}
 
-	private void buildPresentedProjects(List<Object> project) {
-		LocalDate presentedDate = (LocalDate) project.get(1);
+	private void buildPresentedProjects(HistoricProjectBean project) {
+		LocalDate presentedDate = project.getPresentationDate();
 		LocalDate startDate = LocalDate.of(presentedDate.getYear(), Integer.parseInt(config.getSetting("finPresentaciones.mes")),
 				Integer.parseInt(config.getSetting("finPresentaciones.dia")));
 		if (presentedDate.isBefore(startDate)) {
 			if (presentedProjects.containsKey(presentedDate.getYear())) {
-				List<List<Object>> aux = presentedProjects.get(presentedDate.getYear());
-				aux.add(project);
-				presentedProjects.put(presentedDate.getYear(), aux);
+				presentedProjects.get(presentedDate.getYear()).add(project);
 			} else {
-				List<List<Object>> aux = new ArrayList<>();
+				List<HistoricProjectBean> aux = new ArrayList<>();
 				aux.add(project);
 				presentedProjects.put(presentedDate.getYear(), aux);
 			}
@@ -301,13 +323,13 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 
 	private Map<Integer, Number> getStudentsCount() {
 		Map<Integer, Number> studentsCount = new HashMap<>();
-		for (int year = minYear; year <= maxYear; year++) {
-			List<Object> project;
+		for (int year = minCourse; year <= maxCourse; year++) {
+			HistoricProjectBean project;
 			int numStudents = 0;
 			if (newProjects.containsKey(year)) {
 				for (int index = 0; index < newProjects.get(year).size(); index++) {
 					project = newProjects.get(year).get(index);
-					numStudents += getProjectNumberOfStudents(project);
+					numStudents += project.getNumStudents();
 				}
 			}
 			studentsCount.put(year, numStudents);
@@ -315,29 +337,15 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		return studentsCount;
 	}
 
-	private int getProjectNumberOfStudents(List<Object> project) {
-		int projectNumberOfStudents = 0;
-		if (!"".equals(project.get(4)) && project.get(4) != null) {
-			projectNumberOfStudents++;
-		}
-		if (!"".equals(project.get(5)) && project.get(5) != null) {
-			projectNumberOfStudents++;
-		}
-		if (!"".equals(project.get(6)) && project.get(6) != null) {
-			projectNumberOfStudents++;
-		}
-		return projectNumberOfStudents;
-	}
-
 	private Map<Integer, Number> getTutorsCount() {
 		Map<Integer, Number> tutorsCount = new HashMap<>();
-		for (int year = minYear; year <= maxYear; year++) {
-			List<Object> current;
+		for (int year = minCourse; year <= maxCourse; year++) {
+			HistoricProjectBean current;
 			int numTutors = 0;
 			if (newProjects.containsKey(year)) {
 				for (int index = 0; index < newProjects.get(year).size(); index++) {
 					current = newProjects.get(year).get(index);
-					numTutors += getProjectNumberOfTutors(current);
+					numTutors += current.getNumTutors();
 				}
 			}
 			tutorsCount.put(year, numTutors);
@@ -345,26 +353,12 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		return tutorsCount;
 	}
 
-	private int getProjectNumberOfTutors(List<Object> project) {
-		int projectNumberOfTutors = 0;
-		if (!"".equals(project.get(7)) && project.get(7) != null) {
-			projectNumberOfTutors++;
-		}
-		if (!"".equals(project.get(8)) && project.get(8) != null) {
-			projectNumberOfTutors++;
-		}
-		if (!"".equals(project.get(9)) && project.get(9) != null) {
-			projectNumberOfTutors++;
-		}
-		return projectNumberOfTutors;
-	}
-
 	private void createYearlyAverageStats() {
 		Map<Integer, Number> averageScores = getAverageScores();
 		Map<Integer, Number> averageTotalDays = getAverageTotalDays();
 		Map<Integer, Number> averageMonths = new HashMap<>();
 
-		for (int index = minYear; index <= maxYear; index++) {
+		for (int index = minCourse; index <= maxCourse; index++) {
 			Number averageDays = averageTotalDays.get(index);
 			averageMonths.put(index, averageDays.floatValue() / 31);
 		}
@@ -377,7 +371,7 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		List<Number> avgScores = new ArrayList<>();
 		List<Number> avgMonths = new ArrayList<>();
 		
-		for (int year = minYear; year <= maxYear; year++) {
+		for (int year = minCourse; year <= maxCourse; year++) {
 			scores.add(numberFormatter.format(averageScores.get(year)));
 			days.add(numberFormatter.format(averageTotalDays.get(year)));
 			months.add(numberFormatter.format(averageMonths.get(year)));
@@ -385,7 +379,7 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 			avgScores.add(averageScores.get(year));
 			avgMonths.add(averageMonths.get(year));
 		}
-
+		
 		addComponent(new Label("Media de notas por curso: " + scores));
 		addComponent(new Label("Media de dias por curso: " + days));
 		addComponent(new Label("Media de meses por curso: " + months));
@@ -401,17 +395,16 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 
 	private Map<Integer, Number> getAverageScores() {
 		Map<Integer, Number> averageScores = new HashMap<>();
-		for (int year = minYear; year <= maxYear; year++) {
-			List<Object> project;
+		for (int year = minCourse; year <= maxCourse; year++) {
+			HistoricProjectBean project;
 			double mean = 0;
 			if (newProjects.containsKey(year)) {
 				for (int index = 0; index < newProjects.get(year).size(); index++) {
 					project = newProjects.get(year).get(index);
-					double score = (double) project.get(3);
-					mean += score;
+					mean +=  project.getScore();
 				}
+				mean = mean / newProjects.get(year).size();
 			}
-			mean = mean / newProjects.get(year).size();
 			averageScores.put(year, mean);
 		}
 		return averageScores;
@@ -419,17 +412,16 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 
 	private Map<Integer, Number> getAverageTotalDays() {
 		Map<Integer, Number> averageTotalDays = new HashMap<>();
-		for (int year = minYear; year <= maxYear; year++) {
-			List<Object> project;
+		for (int year = minCourse; year <= maxCourse; year++) {
+			HistoricProjectBean project;
 			double mean = 0;
 			if (newProjects.containsKey(year)) {
 				for (int index = 0; index < newProjects.get(year).size(); index++) {
 					project = newProjects.get(year).get(index);
-					int totalDays = (int) project.get(2);
-					mean += totalDays;
+					mean += project.getTotalDays();
 				}
+				mean = mean / newProjects.get(year).size();
 			}
-			mean = mean / newProjects.get(year).size();
 			averageTotalDays.put(year, mean);
 		}
 		return averageTotalDays;
@@ -443,13 +435,13 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		List<Number> yearlyAssignedStudents = new ArrayList<>();
 		List<Number> yearlyAssignedTutors = new ArrayList<>();
 
-		for (int year = minYear; year <= maxYear; year++) {
+		for (int year = minCourse; year <= maxCourse; year++) {
 			courses.add(year - 1 + "/" + year);
-			yearlyAssignedProjects.add(geProjectsCount(newProjects).get(year));
-			yearlyOldProjects.add(geProjectsCount(oldProjects).get(year));
+			yearlyAssignedProjects.add(getProjectsCount(newProjects).get(year));
+			yearlyOldProjects.add(getProjectsCount(oldProjects).get(year));
 			yearlyAssignedStudents.add(getStudentsCount().get(year));
 			yearlyAssignedTutors.add(getTutorsCount().get(year));
-			yearlyPresentedProjects.add(getPresentedCountProjects().get(year));
+			yearlyPresentedProjects.add(getProjectsCount(presentedProjects).get(year));
 		}
 
 		Label asignedYearlyProjects = new Label(
@@ -460,15 +452,13 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 				"Número total de alumnos asignados por curso: " + yearlyAssignedStudents);
 		Label asignedYearlyTutors = new Label(
 				"Número total de tutores con nuevas asignaciones por curso: " + yearlyAssignedTutors);
-		Label asignedOldProjects = new Label("Número de proyectos ya asignados por curso: " + yearlyOldProjects);
 		Label allCourses = new Label("Cursos: " + courses);
 		addComponents(asignedYearlyProjects, presentedYearlyProjects, asignedYearlyStudents, asignedYearlyTutors,
-				asignedOldProjects, allCourses);
+				allCourses);
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
 		for (int i = 0; i < courses.size(); i++) {
 			dataset.addValue(yearlyAssignedProjects.get(i), "Proyectos Asignados", courses.get(i));
-			dataset.addValue(yearlyPresentedProjects.get(i), "Proyectos Presentados", courses.get(i));
 			dataset.addValue(yearlyAssignedStudents.get(i), "Alumnos Asignados", courses.get(i));
 			dataset.addValue(yearlyAssignedTutors.get(i), "Tutores Asignados", courses.get(i));
 			dataset.addValue(yearlyOldProjects.get(i), "Proyectos Ya Asignados", courses.get(i));
@@ -494,9 +484,9 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		addComponent(chartWrapper);
 	}
 
-	private Map<Integer, Number> geProjectsCount(Map<Integer, List<List<Object>>> projects) {
+	private Map<Integer, Number> getProjectsCount(Map<Integer, List<HistoricProjectBean>> projects) {
 		Map<Integer, Number> projectsCount = new HashMap<>();
-		for (int year = minYear; year <= maxYear; year++) {
+		for (int year = minCourse; year <= maxCourse; year++) {
 			int totalProjects = 0;
 			if (projects.containsKey(year))
 				totalProjects += projects.get(year).size();
@@ -505,45 +495,12 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		return projectsCount;
 	}
 
-	private Map<Integer, Number> getPresentedCountProjects() {
-		Map<Integer, Number> presentedCountProjects = new HashMap<>();
-		for (int year = minYear; year <= maxYear; year++) {
-			List<Object> project;
-			Number presented = 0;
-			if (presentedProjects.containsKey(year)) {
-				for (int index = 0; index < presentedProjects.get(year).size(); index++) {
-					project = presentedProjects.get(year).get(index);
-					presented = presented.intValue() + getPresentedProject(project);
-				}
-			}
-			presentedCountProjects.put(year, presented);
-		}
-		return presentedCountProjects;
-	}
-
-	private int getPresentedProject(List<Object> project) {
-		int presented = 0;
-		if (project.get(1) != null && !"".equals(project.get(1))) {
-			presented = 1;
-		}
-		return presented;
-	}
-
-	private LocalDate getYearCourse(Boolean isMinimum) {
+	private LocalDate getCourse(Boolean isMinimum) {
 		LocalDate dateTime = null;
-		if (isMinimum) {
-			try {
-				dateTime = fachadaDatos.getYear(FECHA_PRESENTACION, HISTORICO, true);
-			} catch (SQLException e) {
-				LOGGER.error("Error en obtenerCurso", e);
-			}
-
-		} else {
-			try {
-				dateTime = fachadaDatos.getYear(FECHA_PRESENTACION, HISTORICO, false);
-			} catch (SQLException e) {
-				LOGGER.error("Error en obtenerCurso", e);
-			}
+		try {
+			dateTime = fachadaDatos.getYear(FECHA_PRESENTACION, HISTORICO, isMinimum);
+		} catch (SQLException e) {
+			LOGGER.error("Error en getYear", e);
 		}
 		return dateTime;
 	}

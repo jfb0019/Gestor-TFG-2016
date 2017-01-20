@@ -9,14 +9,16 @@ public class HistoricProjectBean extends ProjectBean implements Serializable {
 
 	private int numStudents;
 
+	private int numTutors;
+
 	private LocalDate assignmentDate;
 
 	private LocalDate presentationDate;
 
-	private String score;
+	private Double score;
 
 	private int totalDays;
-	
+
 	private String repositoryLink;
 
 	public HistoricProjectBean() {
@@ -24,8 +26,8 @@ public class HistoricProjectBean extends ProjectBean implements Serializable {
 	}
 
 	public HistoricProjectBean(String title, String description, String tutor1, String tutor2, String tutor3,
-			String student1, String student2, String student3, int numStudents, LocalDate assignmentDate,
-			LocalDate presentationDate, String score, int totalDays, String repositoryLink) {
+			String student1, String student2, String student3, int numStudents, int numTutors, LocalDate assignmentDate,
+			LocalDate presentationDate, Double score, int totalDays, String repositoryLink) {
 		this.title = title;
 		this.description = description;
 		this.tutor1 = tutor1;
@@ -40,6 +42,7 @@ public class HistoricProjectBean extends ProjectBean implements Serializable {
 		this.score = score;
 		this.totalDays = totalDays;
 		this.repositoryLink = repositoryLink;
+		this.numTutors = numTutors;
 	}
 
 	public int getNumStudents() {
@@ -66,11 +69,11 @@ public class HistoricProjectBean extends ProjectBean implements Serializable {
 		this.presentationDate = presentationDate;
 	}
 
-	public String getScore() {
+	public Double getScore() {
 		return score;
 	}
 
-	public void setScore(String score) {
+	public void setScore(Double score) {
 		this.score = score;
 	}
 
@@ -88,5 +91,13 @@ public class HistoricProjectBean extends ProjectBean implements Serializable {
 
 	public void setRepositoryLink(String repositoryLink) {
 		this.repositoryLink = repositoryLink;
+	}
+
+	public int getNumTutors() {
+		return numTutors;
+	}
+
+	public void setNumTutors(int numTutors) {
+		this.numTutors = numTutors;
 	}
 }
