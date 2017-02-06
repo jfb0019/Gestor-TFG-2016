@@ -15,21 +15,46 @@ import com.vaadin.ui.Button.ClickEvent;
 
 import ubu.digit.ui.components.NavigationBar;
 import ubu.digit.util.ExternalProperties;
-
+/**
+ * Vista de inicio de sesión.
+ * 
+ * @author Javier de la Fuente Barrios
+ */
 public class LoginView extends VerticalLayout implements View {
 
+	/**
+	 * Serial Version UID
+	 */
 	private static final long serialVersionUID = 7873783760565727604L;
 
+	/**
+	 * Nombre de la vista.
+	 */
 	public static final String VIEW_NAME = "login";
 
+	/**
+	 * Fichero de configuración.
+	 */
 	private ExternalProperties config;
 
+	/**
+	 * Campo de texto para el nombre de usuario.
+	 */
 	private TextField userField;
 
+	/**
+	 * Campo para la contraseña.
+	 */
 	private PasswordField passwordField;
 
+	/**
+	 * Botón para iniciar sesión.
+	 */
 	private Button loginButton;
 
+	/**
+	 * Constructor.
+	 */
 	public LoginView() {
 		config = ExternalProperties.getInstance("/WEB-INF/classes/config.properties", false);
 		setMargin(true);
@@ -83,6 +108,15 @@ public class LoginView extends VerticalLayout implements View {
 		setComponentAlignment(fields, Alignment.MIDDLE_CENTER);
 	}
 
+	/**
+	 * Listener para el botón de inicio de sesión.
+	 * 
+	 * Compara el valor de los campos con los del fichero de configuración. 
+	 * Si coinciden, crea una sesión y cambia a la vista de administración. 
+	 * Sino, muestra un mensaje de error.
+	 * 
+	 * @author Javier de la Fuente Barrios
+	 */
 	private class LoginClickListener implements Button.ClickListener {
 
 		private static final long serialVersionUID = 4149064591058379344L;
@@ -116,6 +150,9 @@ public class LoginView extends VerticalLayout implements View {
 		}
 	}
 
+	/**
+	 * La vista se inicializa en el constructor.
+	 */
 	@Override
 	public void enter(ViewChangeEvent event) {
 		userField.focus();

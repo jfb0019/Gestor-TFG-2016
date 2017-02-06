@@ -31,26 +31,63 @@ import static ubu.digit.util.Constants.*;
  * 
  * @author Carlos López Nozal
  * @author Beatriz Zurera Martínez-Acitores
+ * @author Javier de la Fuente Barrios
  * @since 0.5
  */
 public class SistInfData implements Serializable {
 
 	/**
-	 * Literales para realizar consultas SQL.
+	 * Select.
 	 */
 	private static final String SELECT = "select ";
+	
+	/**
+	 * Select all.
+	 */
 	private static final String SELECT_ALL = "select * ";
+	
+	/**
+	 * Select distinct.
+	 */
 	private static final String SELECT_DISTINCT = "select distinct ";
+	
+	/**
+	 * Count.
+	 */
 	private static final String COUNT = "count";
+	
+	/**
+	 * From.
+	 */
 	private static final String FROM = " from ";
+	
+	/**
+	 * Where.
+	 */
 	private static final String WHERE = " where ";
+	
+	/**
+	 * Distinto de vacío.
+	 */
 	private static final String DISTINTO_DE_VACIO = " != ''";
+	
+	/**
+	 * And.
+	 */
 	private static final String AND = " and ";
+	
+	/**
+	 * Like.
+	 */
 	private static final String LIKE = " like ";
+	
+	/**
+	 * Order by.
+	 */
 	private static final String ORDER_BY = " order by ";
 
 	/**
-	 * 
+	 * Serial Version UID.
 	 */
 	private static final long serialVersionUID = -6019587024081762319L;
 
@@ -304,6 +341,8 @@ public class SistInfData implements Serializable {
 	}
 
 	/**
+	 * Obtiene la lista de valores de una columna de una consulta SQL.
+	 * 
 	 * @param columnName
 	 *            Nombre de la columna.
 	 * @param SQL
@@ -325,10 +364,14 @@ public class SistInfData implements Serializable {
 	}
 
 	/**
+	 * Añade los valores de una columna a una lista.
 	 * 
 	 * @param columnName
+	 *            Nombre de la columna.
 	 * @param listValues
+	 *            Lista que guarda los valores.
 	 * @param result
+	 *            ResultSet a partir del cual obtener los valores.
 	 * @throws SQLException
 	 */
 	private void addNumbersToList(String columnName, List<Double> listValues, ResultSet result) throws SQLException {
@@ -614,8 +657,7 @@ public class SistInfData implements Serializable {
 	 */
 	private LocalDate transform(String date) {
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		LocalDate parsedDate = LocalDate.parse(date, dateTimeFormatter);
-		return parsedDate;
+		return LocalDate.parse(date, dateTimeFormatter);
 	}
 
 	/**

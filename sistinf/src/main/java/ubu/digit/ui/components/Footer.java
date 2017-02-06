@@ -21,14 +21,35 @@ import ubu.digit.ui.views.UploadCsvView;
 import ubu.digit.util.ExternalProperties;
 import static ubu.digit.util.Constants.*;
 
+/**
+ * Pié de página común a todas las vistas.
+ * 
+ * @author Javier de la Fuente Barrios
+ *
+ */
 public class Footer extends CustomComponent {
 
+	/**
+	 * Serial Version UID.
+	 */
 	private static final long serialVersionUID = 1285443082746553886L;
 
+	/**
+	 * Contenedor del pié de página.
+	 */
 	private GridLayout content;
 
+	/**
+	 * Nombre del fichero .csv relacionado con la vista
+	 */
 	private String fileName;
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param fileName
+	 *            nombre del fichero .csv relacionado con la vista.
+	 */
 	public Footer(String fileName) {
 		this.fileName = fileName;
 		content = new GridLayout(2, 1);
@@ -45,6 +66,9 @@ public class Footer extends CustomComponent {
 		setCompositionRoot(content);
 	}
 
+	/**
+	 * Añade la información del proyecto.
+	 */
 	private void addInformation() {
 		VerticalLayout information = new VerticalLayout();
 		information.setMargin(false);
@@ -71,6 +95,13 @@ public class Footer extends CustomComponent {
 		content.addComponent(information);
 	}
 
+	/**
+	 * Obtiene la fecha de última modificación del fichero asociado a la vista.
+	 * 
+	 * @param fileName
+	 *            nombre del fichero
+	 * @return fecha de última modificación del fichero
+	 */
 	private String getLastModified(String fileName) {
 		String serverPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 		ExternalProperties config = ExternalProperties.getInstance("/WEB-INF/classes/config.properties", false);
@@ -86,6 +117,9 @@ public class Footer extends CustomComponent {
 		return lastModified;
 	}
 
+	/**
+	 * Añade la información de la licencia del proyecto.
+	 */
 	private void addLicense() {
 		VerticalLayout license = new VerticalLayout();
 		license.setMargin(false);
@@ -111,9 +145,17 @@ public class Footer extends CustomComponent {
 		content.addComponent(license);
 	}
 
+	/**
+	 * Listener para el botón que accede a la pantalla de administración.
+	 * 
+	 * @author Javier de la Fuente Barrios
+	 */
 	private final class LoginClickListener implements Button.ClickListener {
 		private static final long serialVersionUID = -861788921350517735L;
 	
+		/**
+		 * Acción a realizar al recibir el evento de un click.
+		 */
 		@Override
 		public void buttonClick(ClickEvent event) {
 			 UI.getCurrent().getNavigator().navigateTo(UploadCsvView.VIEW_NAME);				

@@ -24,8 +24,16 @@ import ubu.digit.ui.listeners.OrSimpleStringFilterListener;
 import ubu.digit.ui.listeners.SimpleStringFilterListener;
 import static ubu.digit.util.Constants.*;
 
+/**
+ * Vista de proyectos activos.
+ * 
+ * @author Javier de la Fuente Barrios
+ */
 public class ActiveProjectsView extends VerticalLayout implements View {
 
+	/**
+	 * Serial Version UID.
+	 */
 	private static final long serialVersionUID = 8857805864102975132L;
 
 	/**
@@ -33,24 +41,54 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 	 */
 	private static final Logger LOGGER = Logger.getLogger(ActiveProjectsView.class);
 
+	/**
+	 * Nombre de la vista.
+	 */
 	public static final String VIEW_NAME = "active-projects";
 
+	/**
+	 * Fachada para obtener los datos.
+	 */
 	private SistInfData fachadaDatos;
 
+	/**
+	 * Contenedor de POJOS de proyectos activos.
+	 */
 	private BeanItemContainer<ActiveProjectBean> beans;
 
+	/**
+	 * Tabla de proyectos.
+	 */
 	private Table table;
 
+	/**
+	 * Campo de texto para filtrar por proyecto.
+	 */
 	private TextField projectFilter;
 
+	/**
+	 * Campo de texto para filtrar por descripción.
+	 */
 	private TextField descriptionFilter;
 
+	/**
+	 * Campo de texto para filtrar por tutor.
+	 */
 	private TextField tutorsFilter;
 
+	/**
+	 * Campo de texto para filtrar por alumno.
+	 */
 	private TextField studentsFilter;
 
+	/**
+	 * Campo de texto para filtrar por curso.
+	 */
 	private TextField courseFilter;
 
+	/**
+	 * Constructor.
+	 */
 	public ActiveProjectsView() {
 		fachadaDatos = SistInfData.getInstance();
 		setMargin(true);
@@ -69,6 +107,9 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 		addComponent(footer);
 	}
 
+	/**
+	 * Crea el modelo de datos de los proyectos activos.
+	 */
 	private void createDataModel() {
 		beans = new BeanItemContainer<>(ActiveProjectBean.class);
 		try (ResultSet result = fachadaDatos.getResultSet(PROYECTO, TITULO)) {
@@ -104,6 +145,9 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 		}
 	}
 
+	/**
+	 * Crea las métricas de los proyectos activos.
+	 */
 	private void createMetrics() {
 		Label metricsTitle = new Label(INFO_ESTADISTICA);
 		metricsTitle.setStyleName("lbl-title");
@@ -130,6 +174,9 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 		}
 	}
 
+	/**
+	 * Crea los filtros de la tabla.
+	 */
 	private void createFilters() {
 		Label filtersTitle = new Label(FILTROS);
 		filtersTitle.setStyleName(TITLE_STYLE);
@@ -157,6 +204,9 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 		filters.addComponent(courseFilter);
 	}
 
+	/**
+	 * Crea la tabla de proyectos activos.
+	 */
 	private void createCurrentProjectsTable() {
 		Label proyectosTitle = new Label(DESCRIPCION_PROYECTOS);
 		proyectosTitle.setStyleName(TITLE_STYLE);
@@ -175,12 +225,18 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 		setColumnExpandRatios();
 	}
 
+	/**
+	 * Añade las columnas generadas a la tabla.
+	 */
 	private void addGeneratedColumns(){
 		table.addGeneratedColumn(TUTORS, new TutorsColumnGenerator());
 		table.addGeneratedColumn(STUDENTS, new StudentsColumnGenerator());
 		
 	}
 	
+	/**
+	 * Establece las cabeceras de las columnas de la tabla.
+	 */
 	private void setTableColumnHeaders() {
 		table.setColumnHeader(TITLE, "Título");
 		table.setColumnHeader(DESCRIPTION, "Descripción");
@@ -189,6 +245,9 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 		table.setColumnHeader(COURSE_ASSIGNMENT, "Curso Asignación");
 	}
 
+	/**
+	 * Establece el ratio de expansión de las columnas.
+	 */
 	private void setColumnExpandRatios() {
 		table.setColumnExpandRatio(TITLE, 5);
 		table.setColumnExpandRatio(DESCRIPTION, 17);
@@ -197,7 +256,9 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 		table.setColumnExpandRatio(COURSE_ASSIGNMENT, 3);
 	}
 
-
+	/**
+	 * Añade los listeners de los filtros. 
+	 */
 	private void addFiltersListeners() {
 		projectFilter.addTextChangeListener(new SimpleStringFilterListener(table, TITLE));
 		descriptionFilter.addTextChangeListener(new SimpleStringFilterListener(table, DESCRIPTION));
@@ -206,6 +267,9 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 		courseFilter.addTextChangeListener(new SimpleStringFilterListener(table, COURSE_ASSIGNMENT));
 	}
 
+	/**
+	 * La vista se inicializa en el constructor.
+	 */
 	@Override
 	public void enter(ViewChangeEvent event) {
 		// Se inicializa el contenido de la vista en el constructor

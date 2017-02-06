@@ -8,10 +8,23 @@ import com.vaadin.ui.Table.ColumnGenerator;
 
 import ubu.digit.ui.beans.ProjectBean;
 
+/**
+ * Generador de las columnas de los tutores. Agrupa los distintos tutores si el
+ * proyecto tiene más de uno.
+ * 
+ * @author Javier de la Fuente Barrios
+ *
+ */
 public class TutorsColumnGenerator implements ColumnGenerator {
 
+	/**
+	 * Serial Version UID.
+	 */
 	private static final long serialVersionUID = -3597867904954299136L;
 
+	/**
+	 * Genera la celda correspondiente.
+	 */
 	@Override
 	public Object generateCell(Table source, Object itemId, Object columnId) {
 		BeanItem<?> item = (BeanItem<?>) source.getItem(itemId);
@@ -32,6 +45,14 @@ public class TutorsColumnGenerator implements ColumnGenerator {
 		return cellContent;
 	}
 
+	/**
+	 * Añade el nombre de un tutor (si existe) a un contenedor.
+	 * 
+	 * @param field
+	 *            nombre del tutor
+	 * @param cellContent
+	 *            contenedor de tutores
+	 */
 	private void createCell(String field, VerticalLayout cellContent) {
 		if (!"".equals(field) && field != null)
 			cellContent.addComponent(new Label(field));

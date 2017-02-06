@@ -34,34 +34,81 @@ import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.Upload.SucceededListener;
 import com.vaadin.ui.VerticalLayout;
 
+/**
+ * Vista de administración.
+ * 
+ * @author Javier de la Fuente Barrios
+ */
 public class UploadCsvView extends VerticalLayout implements View {
 
+	/**
+	 * Serial Version UID.
+	 */
 	private static final long serialVersionUID = 8460171059055033456L;
 
+	/**
+	 * Logger de la clase.
+	 */
 	private static final Logger LOGGER = Logger.getLogger(UploadCsvView.class);
 
+	/**
+	 * Nombre de la vista.
+	 */
 	public static final String VIEW_NAME = "upload";
 
+	/**
+	 * Etiqueta para mostrar el nombre de usuario.
+	 */
 	private Label userText;
 
+	/**
+	 * Botón para cerrar sesión.
+	 */
 	private Button logout;
 
+	/**
+	 * Elemento para subida de archivos.
+	 */
 	private Upload upload;
 
+	/**
+	 * Barra de progreso para la subida de archivos.
+	 */
 	private ProgressBar progress;
 
+	/**
+	 * 
+	 */
 	private CsvReceiver csvReceiver;
 
+	/**
+	 * Etiqueta para mostrar el estado de la subida.
+	 */
 	private Label state;
 
+	/**
+	 * Ruta del servidor.
+	 */
 	private String serverPath;
 
+	/**
+	 * Fichero de configuración.
+	 */
 	private ExternalProperties config;
 
+	/**
+	 * Directorio de los archivos csv.
+	 */
 	private String dirCsv;
 
+	/**
+	 * Ruta completa a los archivos csv.
+	 */
 	private String completeDir;
 
+	/**
+	 * Constructor.
+	 */
 	public UploadCsvView() {
 		setMargin(true);
 		setSpacing(true);
@@ -100,11 +147,26 @@ public class UploadCsvView extends VerticalLayout implements View {
 		addComponents(userText, upload, progress, state, logout);
 	}
 
+	/**
+	 * Receptor de ficheros csv.
+	 * 
+	 * @author Javier de la Fuente Barrios
+	 */
 	class CsvReceiver implements Receiver, StartedListener, ProgressListener, FinishedListener, SucceededListener,
 			FailedListener {
+		/**
+		 * Serial Version UID.
+		 */
 		private static final long serialVersionUID = -1414096228596596894L;
+
+		/**
+		 * Stream de salida para escribir ficheros.
+		 */
 		private transient FileOutputStream fos;
 
+		/**
+		 * Proporciona un stream de salida para escribir el fichero a subir.
+		 */
 		@Override
 		public OutputStream receiveUpload(String filename, String mimeType) {
 			fos = null;
@@ -119,13 +181,25 @@ public class UploadCsvView extends VerticalLayout implements View {
 			return fos;
 		}
 
+		/**
+		 * Stream nulo para evitar execpciones.
+		 * 
+		 * @author Javier de la Fuente Barrios
+		 */
 		private class NullOutputStream extends OutputStream {
+
+			/**
+			 * Operación de escritura, no realiza nada.
+			 */
 			@Override
 			public void write(int b) throws IOException {
 				// Null output stream to write to nowhere
 			}
 		}
 
+		/**
+		 * Comienzo de la subida.
+		 */
 		@Override
 		public void uploadStarted(StartedEvent event) {
 			if (event.getFilename().isEmpty() || event.getFilename() == null) {
@@ -146,6 +220,9 @@ public class UploadCsvView extends VerticalLayout implements View {
 			state.setValue("Subiendo fichero");
 		}
 
+		/**
+		 * Progreso de la subida.
+		 */
 		@Override
 		public void updateProgress(long readBytes, long contentLength) {
 			progress.setValue(new Float(readBytes / (float) contentLength));
@@ -153,17 +230,26 @@ public class UploadCsvView extends VerticalLayout implements View {
 
 		}
 
+		/**
+		 * Finalización de la subida.
+		 */
 		@Override
 		public void uploadFinished(FinishedEvent event) {
 			state.setValue("Idle");
 			closeResources();
 		}
 
+		/**
+		 * Subida completada y satisfactoria.
+		 */
 		@Override
 		public void uploadSucceeded(SucceededEvent event) {
 			state.setValue("Subida de fichero " + event.getFilename() + " existosa.");
 		}
 
+		/**
+		 * Subida completada pero errónea.
+		 */
 		@Override
 		public void uploadFailed(FailedEvent event) {
 			state.setValue("Subida de fichero " + event.getFilename() + " fallida");
@@ -176,6 +262,9 @@ public class UploadCsvView extends VerticalLayout implements View {
 			}
 		}
 
+		/**
+		 * Cierra los recursos.
+		 */
 		private void closeResources() {
 			if (fos != null) {
 				try {
@@ -187,9 +276,21 @@ public class UploadCsvView extends VerticalLayout implements View {
 		}
 	}
 
+	/**
+	 * Listener para el botón de cerrar sesión.
+	 * 
+	 * @author Javier de la Fuente Barrios
+	 */
 	private class LogoutListener implements Button.ClickListener {
+
+		/**
+		 * Serial Version UID.
+		 */
 		private static final long serialVersionUID = -6910251607481142610L;
 
+		/**
+		 * Acción a realizar al recibir el evento.
+		 */
 		@Override
 		public void buttonClick(ClickEvent event) {
 			getSession().setAttribute("user", null);
@@ -198,6 +299,9 @@ public class UploadCsvView extends VerticalLayout implements View {
 		}
 	}
 
+	/**
+	 * Acción a realizar al entrar en la vista.
+	 */
 	@Override
 	public void enter(ViewChangeEvent event) {
 		String username = String.valueOf(getSession().getAttribute("user"));

@@ -14,10 +14,14 @@ import com.vaadin.server.VaadinService;
  * Clase para la obtención de los valores de las propiedades.
  * 
  * @author Beatriz Zurera Martínez-Acitores.
+ * @author Javier de la Fuente Barrios
  * @since 3.0
  */
 public class ExternalProperties implements Serializable {
 
+	/**
+	 * Serial Version UID.
+	 */
 	private static final long serialVersionUID = 3667519929144990872L;
 
 	/**
@@ -89,7 +93,7 @@ public class ExternalProperties implements Serializable {
      * @return El valor de la propiedad.
      */
     public String getSetting(String key) {
-        return PROPERTIES.getProperty(key).trim();
-    }
+		return PROPERTIES.getProperty(key).trim();
+	}
 
 }

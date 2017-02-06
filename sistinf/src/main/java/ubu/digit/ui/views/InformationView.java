@@ -21,9 +21,16 @@ import ubu.digit.ui.components.Footer;
 import ubu.digit.ui.components.NavigationBar;
 import ubu.digit.util.ExternalProperties;
 import static ubu.digit.util.Constants.*;
-
+/**
+ * Vista de información.
+ * 
+ * @author Javier de la Fuente Barrios
+ */
 public class InformationView extends VerticalLayout implements View {
 
+	/**
+	 * Serial Version UID.
+	 */
 	private static final long serialVersionUID = 7820866989198327219L;
 
 	/**
@@ -31,12 +38,24 @@ public class InformationView extends VerticalLayout implements View {
 	 */
 	private static final Logger LOGGER = Logger.getLogger(SistInfData.class);
 
+	/**
+	 * Fichero de configuración.
+	 */
 	private ExternalProperties config;
 
+	/**
+	 * Fachada para obtener los datos.
+	 */
 	private SistInfData fachadaDatos;
 
+	/**
+	 * Nombre de la vista.
+	 */
 	public static final String VIEW_NAME = "information";
 
+	/**
+	 * Constructor.
+	 */
 	public InformationView() {
 		fachadaDatos = SistInfData.getInstance();
 		config = ExternalProperties.getInstance("/WEB-INF/classes/config.properties", false);
@@ -56,6 +75,9 @@ public class InformationView extends VerticalLayout implements View {
 		addComponent(footer);
 	}
 	
+	/**
+	 * Crea el tribunal.
+	 */
 	private void createTribunal() {
 		Label tribunalTitle = new Label(MIEMBROS_DEL_TRIBUNAL);
 		tribunalTitle.setStyleName(TITLE_STYLE);
@@ -90,6 +112,9 @@ public class InformationView extends VerticalLayout implements View {
 		addComponents(tribunalTitle, horizontalTribunal, curso);
 	}
 
+	/**
+	 * Crea las normas de entrega.
+	 */
 	private void createNormas() {
 		addComponent(new Label(WHITE_LINE, ContentMode.HTML));
 		Label normasTitle = new Label(ESPECIFICACIONES_DE_ENTREGA);
@@ -109,6 +134,9 @@ public class InformationView extends VerticalLayout implements View {
 		addComponents(normasTitle, normas);
 	}
 
+	/**
+	 * Crea el calendario.
+	 */
 	private void createCalendar() {
 		addComponent(new Label(WHITE_LINE, ContentMode.HTML));
 		Label fechasTitle = new Label(FECHAS_DE_ENTREGA);
@@ -121,6 +149,9 @@ public class InformationView extends VerticalLayout implements View {
 		addComponents(fechasTitle, calendar);
 	}
 
+	/**
+	 * Crea los documentos de entrega.
+	 */
 	private void createDocumentos() {
 		addComponent(new Label(WHITE_LINE, ContentMode.HTML));
 		Label documentosTitle = new Label(DOCUMENTOS);
@@ -144,6 +175,9 @@ public class InformationView extends VerticalLayout implements View {
 		addComponent(new Label(WHITE_LINE, ContentMode.HTML));
 	}
 
+	/**
+	 * La vista se inicializa en el constructor. 
+	 */
 	@Override
 	public void enter(ViewChangeEvent event) {
 		// Se inicializa el contenido de la vista en el constructor

@@ -6,7 +6,7 @@
 	<groupId>ubu.digit.ui</groupId>
 	<artifactId>sistinf</artifactId>
 	<packaging>war</packaging>
-	<version>0.3</version>
+	<version>0.4</version>
 	<name>sistinf</name>
 
 	<prerequisites>
@@ -209,7 +209,6 @@
 						<ignores>
 							<ignore>org.apache.log4j.Logger.*</ignore>
 						</ignores>
-						<!-- <excludes> <exclude>**/SistInfUI.class</exclude> </excludes> -->
 					</instrumentation>
 				</configuration>
 				<executions>

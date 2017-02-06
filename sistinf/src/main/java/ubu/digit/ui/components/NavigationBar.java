@@ -14,32 +14,61 @@ import static ubu.digit.util.Constants.*;
 
 import com.vaadin.ui.Button.ClickEvent;
 
+/**
+ * Barra de navegación común a todas las vistas.
+ * 
+ * @author Javier de la Fuente Barrios
+ */
 public class NavigationBar extends CustomComponent {
 
 	/**
-	 * 
+	 * Serial Version UID.
 	 */
 	private static final long serialVersionUID = -3164191122994765469L;
 
+	/**
+	 * Botón de la vista de información.
+	 */
 	private Button buttonInfo;
+	
+	/**
+	 * Botón de la vista de proyectos activos.
+	 */
 	private Button buttonActive;
+
+	/**
+	 * Botón de la vista de proyectos históricos.
+	 */
 	private Button buttonHistory;
+	
+	/**
+	 * Botón de la vista de métricas.
+	 */
 	private Button buttonMetrics;
 
+	/**
+	 * Navegador de la aplicación.
+	 */
 	private Navigator navigator;
-
+	
+	/**
+	 * Constructor.
+	 */
 	public NavigationBar() {
 		HorizontalLayout content = new HorizontalLayout();
 		content.setMargin(false);
 		content.setSpacing(false);
 		content.setWidth("100%");
 
-		inicializarComponentes();
+		initComponents();
 		content.addComponents(buttonInfo, buttonActive, buttonHistory, buttonMetrics);
 		setCompositionRoot(content);
 	}
 
-	private void inicializarComponentes() {
+	/**
+	 * Inicializa los botones de navegación.
+	 */
+	private void initComponents() {
 		navigator = UI.getCurrent().getNavigator();
 
 		buttonInfo = new Button(INFORMACION);
@@ -62,6 +91,13 @@ public class NavigationBar extends CustomComponent {
 		buttonMetrics.setWidth("100%");
 	}
 
+	/**
+	 * Listener para los botones.
+	 * 
+	 * Redirige a una vista u otra dependiendo del origen del evento.
+	 * 
+	 * @author Javier de la Fuente Barrios
+	 */
 	private class ButtonClick implements Button.ClickListener {
 		private static final long serialVersionUID = -2703551968601700023L;
 

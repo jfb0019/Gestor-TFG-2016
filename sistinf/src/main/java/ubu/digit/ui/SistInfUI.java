@@ -21,20 +21,25 @@ import ubu.digit.ui.views.MetricsView;
 import ubu.digit.ui.views.UploadCsvView;
 
 /**
- * This UI is the application entry point. A UI may either represent a browser
- * window (or tab) or some part of a html page where a Vaadin application is
- * embedded.
- * <p>
- * The UI is initialized using {@link #init(VaadinRequest)}. This method is
- * intended to be overridden to add component to the user interface and
- * initialize non-component functionality.
+ * La UI es el punto de entrada de la aplicación.
+ * @author Javier de la Fuente Barrios.
  */
 @Theme("sistinftheme")
 public class SistInfUI extends UI {
 
+	/**
+	 * Serial Version UID.
+	 */
 	private static final long serialVersionUID = -4568743602891945769L;
+	
+	/**
+	 * Navegador de la aplicación.
+	 */
 	private Navigator navigator;
 
+	/**
+	 * Inicializa el navegador y las vistas.
+	 */
 	@Override
 	protected void init(VaadinRequest vaadinRequest) {
 		Page.getCurrent().setTitle("Sistemas Informáticos");
@@ -57,9 +62,20 @@ public class SistInfUI extends UI {
 		navigator.addViewChangeListener(new NavigatorViewChangeListener());
 	}
 
+	/**
+	 * Listener que restringe la pantalla de administración a un usuario
+	 * registrado. Si no está registrado le redirige a la pantalla de inicio de
+	 * sesión.
+	 * 
+	 * @author Javier de la Fuente Barrios
+	 *
+	 */
 	private class NavigatorViewChangeListener implements ViewChangeListener {
 		private static final long serialVersionUID = -650123765531182231L;
 
+		/**
+		 * Acción a realizar antes de cambiar de vista.
+		 */
 		@Override
 		public boolean beforeViewChange(ViewChangeEvent event) {
 			boolean isUserLoggedIn = getSession().getAttribute("user") != null;
@@ -69,25 +85,36 @@ public class SistInfUI extends UI {
 			if (!isUserLoggedIn && isNextViewUploadCsvView) {
 				Notification.show("Error", "Por favor inicie sesión para acceder a esta página.",
 						Notification.Type.WARNING_MESSAGE);
-				getNavigator().navigateTo(LoginView.VIEW_NAME);
+				navigator.navigateTo(LoginView.VIEW_NAME);
 				return false;
 			} else if (isUserLoggedIn && isNextViewLoginView) {
-				getNavigator().navigateTo(UploadCsvView.VIEW_NAME);
+				navigator.navigateTo(UploadCsvView.VIEW_NAME);
 				return false;
 			}
 			return true;
 		}
 
+		/**
+		 * Accion a realizar después de cambiar de vista.
+		 */
 		@Override
 		public void afterViewChange(ViewChangeEvent event) {
 			// Not needed
 		}
 	}
 
+	/**
+	 * Servlet.
+	 * @author Javier de la Fuente Barrios
+	 *
+	 */
 	@WebServlet(urlPatterns = "/*", name = "SistInfUIServlet", asyncSupported = true)
-	@VaadinServletConfiguration(ui = SistInfUI.class, productionMode = false)
+	@VaadinServletConfiguration(ui = SistInfUI.class, productionMode = true)
 	public static class SistInfUIServlet extends VaadinServlet {
 
+		/**
+		 * Serial Version UID.
+		 */
 		private static final long serialVersionUID = -8278292941976902830L;
 	}
 }

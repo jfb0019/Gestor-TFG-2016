@@ -8,10 +8,23 @@ import com.vaadin.ui.Table.ColumnGenerator;
 
 import ubu.digit.ui.beans.HistoricProjectBean;
 
+/**
+ * Generador de las columnas de los proyectos. Si el proyecto dispone de enlace
+ * a repositorio, se añade un link a éste.
+ * 
+ * @author Javier de la Fuente Barrios
+ *
+ */
 public class ProjectsColumnGenerator implements ColumnGenerator {
 
+	/**
+	 * Serial Version UID.
+	 */
 	private static final long serialVersionUID = -5925982074718277269L;
 
+	/**
+	 * Genera la celda correspondiente.
+	 */
 	@Override
 	public Object generateCell(Table source, Object itemId, Object columnId) {
 		BeanItem<?> item = (BeanItem<?>) source.getItem(itemId);

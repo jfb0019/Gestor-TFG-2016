@@ -49,9 +49,16 @@ import ubu.digit.ui.listeners.OrSimpleStringFilterListener;
 import ubu.digit.ui.listeners.SimpleStringFilterListener;
 import ubu.digit.util.ExternalProperties;
 import static ubu.digit.util.Constants.*;
-	
+/**
+ * Vista de proyectos históricos.
+ * 
+ * @author Javier de la Fuente Barrios.
+ */
 public class HistoricProjectsView extends VerticalLayout implements View {
 
+	/**
+	 * Serial Version UID.
+	 */
 	private static final long serialVersionUID = 8431807779365780674L;
 
 	/**
@@ -59,40 +66,94 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 	 */
 	private static final Logger LOGGER = Logger.getLogger(HistoricProjectsView.class);
 
+	/**
+	 * Nombre de la vista.
+	 */
 	public static final String VIEW_NAME = "historic-projects";
 
+	/**
+	 * Contenedor de POJOS de proyectos históricos.
+	 */
 	private BeanItemContainer<HistoricProjectBean> beans;
 
+	/**
+	 * Fachada para obtener los datos.
+	 */
 	private SistInfData fachadaDatos;
 
+	/**
+	 * Fichero de configuración.
+	 */
 	private ExternalProperties config;
 
+	/**
+	 * Tabla de proyectos históricos.
+	 */
 	private Table table;
 
+	/**
+	 * Formateador de números.
+	 */
 	private NumberFormat numberFormatter;
 	
-	private DateTimeFormatter dateTimeFormatter;
+	/**
+	 * Formateador de fechas.
+	 */
+	private transient DateTimeFormatter dateTimeFormatter;
 	
+	/**
+	 * Mapa auxiliar con los diferentes cursos.
+	 */
 	private transient Map<Integer, List<HistoricProjectBean>> yearOfProjects;
-
+	
+	/**
+	 * Mapa con los cursos que tienen proyectos de nueva asignación.
+	 */
 	private transient Map<Integer, List<HistoricProjectBean>> newProjects;
 
+	/**
+	 * Mapa con los cursos que tienen proyectos ya asignados.
+	 */
 	private transient Map<Integer, List<HistoricProjectBean>> oldProjects;
 
+	/**
+	 * Mapa con los cursos que tienen proyectos presentados.
+	 */
 	private transient Map<Integer, List<HistoricProjectBean>> presentedProjects;
 
+	/**
+	 * Menor curso total (más antiguo).
+	 */
 	private int minCourse;
 
+	/**
+	 * Mayor curso total (más actual).
+	 */
 	private int maxCourse;
 
+	/**
+	 * Campo de texto para filtrar por proyecto.
+	 */
 	private TextField projectFilter;
-
+	
+	/**
+	 * Campo de texto para filtrar por tutores.
+	 */
 	private TextField tutorsFilter;
-
+	
+	/**
+	 * Campo de texto para filtrar por fecha de asignación.
+	 */
 	private TextField assignmentDateFilter;
 
+	/**
+	 * Campo de texto para filtrar por fecha de presentación.
+	 */
 	private TextField presentationDateFilter;
 
+	/**
+	 * Constructor.
+	 */
 	public HistoricProjectsView() {
 		fachadaDatos = SistInfData.getInstance();
 		config = ExternalProperties.getInstance("/WEB-INF/classes/config.properties", false);
@@ -117,13 +178,16 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		addComponent(footer);
 	}
 
+	/**
+	 * Crea el modelo de datos de los proyectos históricos.
+	 */
 	private void createDataModel() {
 		beans = new BeanItemContainer<>(HistoricProjectBean.class);
 		try (ResultSet result = fachadaDatos.getResultSet(HISTORICO, TITULO)) {
 			while (result.next()) {
 				int numStudents = 0;
 				int numTutors = 0;
-				String title = result.getString(TITULO);
+				String title = result.getString(TITULO_CORTO);
 				String description = result.getString(DESCRIPCION);
 				String tutor1 = result.getString(TUTOR1);
 				if (tutor1 == null || "".equals(tutor1)) {
@@ -180,6 +244,9 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		}
 	}
 
+	/**
+	 * Crea las métricas globales de los proyectos históricos.
+	 */
 	private void createGlobalMetrics() {
 		Label metricsTitle = new Label(INFO_ESTADISTICA);
 		metricsTitle.setStyleName(TITLE_STYLE);
@@ -220,12 +287,18 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		}
 	}
 
+	/**
+	 * Crea las métricas anuales de los proyectos históricos.
+	 */
 	private void createYearlyMetrics() {
 		initProjectsStructures();
 		createYearlyAverageStats();
 		createYearlyTotalStats();
 	}
 
+	/**
+	 * Inicializa los mapas.
+	 */
 	private void initProjectsStructures() {
 		minCourse = getCourse(true).getYear();
 		maxCourse = getCourse(false).getYear();
@@ -251,6 +324,9 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		organizeProjects();
 	}
 
+	/**
+	 * Organiza los proyectos (nueva o vieja asignación, y presentados).
+	 */
 	private void organizeProjects() {
 		Iterator<Integer> iterator = yearOfProjects.keySet().iterator();
 		while (iterator.hasNext()) {
@@ -276,12 +352,36 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		}
 	}
 
+	/**
+	 * Asigna un proyecto a los distintos cursos que pertenece.
+	 * 
+	 * @param year
+	 *            curso actual
+	 * @param project
+	 *            proyecto actual
+	 * @param totalYears
+	 *            nº de años que dura el proyecto
+	 * @param isCurrentCourse
+	 *            si el proyecto se corresponde con el curso actual
+	 */
 	private void assignProjectCourses(int year, HistoricProjectBean project, int totalYears, boolean isCurrentCourse) {
 		for (int yearCount = 0; yearCount <= totalYears; yearCount++) {
 			assignProject(year, yearCount, project, isCurrentCourse);
 		}
 	}
 
+	/**
+	 * Asigna un proyecto a su respectivo curso.
+	 * 
+	 * @param year
+	 *            curso actual
+	 * @param yearCount
+	 *            nº de año
+	 * @param project
+	 *            proyecto actual
+	 * @param isCurrentCourse
+	 *            si el proyecto se corresponde con el curso actual
+	 */
 	private void assignProject(int year, int yearCount, HistoricProjectBean project, boolean isCurrentCourse) {
 		int before = 0;
 		if (!isCurrentCourse) {
@@ -306,6 +406,12 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		}
 	}
 
+	/**
+	 * Añade un proyecto a presentedProjects si este se ha presentado.
+	 * 
+	 * @param project
+	 *            proyecto actual
+	 */
 	private void buildPresentedProjects(HistoricProjectBean project) {
 		LocalDate presentedDate = project.getPresentationDate();
 		LocalDate startDate = LocalDate.of(presentedDate.getYear(), Integer.parseInt(config.getSetting("finPresentaciones.mes")),
@@ -321,6 +427,13 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		}
 	}
 
+	/**
+	 * Obtiene el número de alumnos con proyectos de nueva asignación en cada
+	 * curso.
+	 * 
+	 * @return número de alumnos con proyectos de nueva asignación en cada
+	 *         curso.
+	 */
 	private Map<Integer, Number> getStudentsCount() {
 		Map<Integer, Number> studentsCount = new HashMap<>();
 		for (int year = minCourse; year <= maxCourse; year++) {
@@ -337,6 +450,13 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		return studentsCount;
 	}
 
+	/**
+	 * Obtiene el número de tutores con proyectos de nueva asignación en cada
+	 * curso.
+	 * 
+	 * @return número de tutores con proyectos de nueva asignación en cada
+	 *         curso.
+	 */
 	private Map<Integer, Number> getTutorsCount() {
 		Map<Integer, Number> tutorsCount = new HashMap<>();
 		for (int year = minCourse; year <= maxCourse; year++) {
@@ -353,6 +473,9 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		return tutorsCount;
 	}
 
+	/**
+	 * Genera las estadísticas (medias aritméticas) anuales de los proyectos históricos.
+	 */
 	private void createYearlyAverageStats() {
 		Map<Integer, Number> averageScores = getAverageScores();
 		Map<Integer, Number> averageTotalDays = getAverageTotalDays();
@@ -393,6 +516,11 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		createChart(dataset);
 	}
 
+	/**
+	 * Obtiene la media aritmética de las notas de cada curso.
+	 * 
+	 * @return media aritmética de las notas de cada curso.
+	 */
 	private Map<Integer, Number> getAverageScores() {
 		Map<Integer, Number> averageScores = new HashMap<>();
 		for (int year = minCourse; year <= maxCourse; year++) {
@@ -410,6 +538,11 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		return averageScores;
 	}
 
+	/**
+	 * Obtiene la media del número de días que duran los proyectos cada curso.
+	 * 
+	 * @return media del número de días que duran los proyectos cada curso.
+	 */
 	private Map<Integer, Number> getAverageTotalDays() {
 		Map<Integer, Number> averageTotalDays = new HashMap<>();
 		for (int year = minCourse; year <= maxCourse; year++) {
@@ -427,6 +560,9 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		return averageTotalDays;
 	}
 
+	/**
+	 * Genera las estadísticas (totales) anuales de los proyectos históricos.
+	 */
 	private void createYearlyTotalStats() {
 		List<String> courses = new ArrayList<>();
 		List<Number> yearlyAssignedProjects = new ArrayList<>();
@@ -467,6 +603,11 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		createChart(dataset);
 	}
 
+	/**
+	 * Crea una gráfica a partir de unos datos.
+	 * 
+	 * @param dataset datos para generar la gráfica
+	 */
 	private void createChart(DefaultCategoryDataset dataset) {
 		JFreeChart chart = ChartFactory.createLineChart("Métricas agrupadas por curso", "Curso", "Nº", dataset,
 				PlotOrientation.VERTICAL, true, true, false);
@@ -484,6 +625,13 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		addComponent(chartWrapper);
 	}
 
+	/**
+	 * Obtiene el número de proyectos de cada curso.
+	 * 
+	 * @param projects
+	 *            projectos agrupados por curso
+	 * @return número de proyectos de cada curso.
+	 */
 	private Map<Integer, Number> getProjectsCount(Map<Integer, List<HistoricProjectBean>> projects) {
 		Map<Integer, Number> projectsCount = new HashMap<>();
 		for (int year = minCourse; year <= maxCourse; year++) {
@@ -495,6 +643,13 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		return projectsCount;
 	}
 
+	/**
+	 * Obtiene el curso mínimo o máximo de los proyectos históricos.
+	 * 
+	 * @param isMinimum
+	 *            si se quiere obtener el curso mínimo o máximo
+	 * @return curso mínimo o máximo
+	 */
 	private LocalDate getCourse(Boolean isMinimum) {
 		LocalDate dateTime = null;
 		try {
@@ -505,6 +660,9 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		return dateTime;
 	}
 
+	/**
+	 * Crea los filtros de la tabla de proyectos históricos.
+	 */
 	private void createFilters() {
 		Label filtersTitle = new Label(FILTROS);
 		filtersTitle.setStyleName(TITLE_STYLE);
@@ -529,6 +687,9 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		filters.addComponent(presentationDateFilter);
 	}
 
+	/**
+	 * Crea la tabla de proyectos históricos.
+	 */
 	private void createHistoricProjectsTable() {
 		Label projectsTitle = new Label(DESCRIPCION_PROYECTOS);
 		projectsTitle.setStyleName(TITLE_STYLE);
@@ -547,12 +708,19 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		showDescriptionOnClick();
 	}
 
+	/**
+	 * Añade las columnas genereadas a la tabla de proyectos históricos.
+	 */
 	private void addGeneratedColumns(){
 		table.addGeneratedColumn(TUTORS, new TutorsColumnGenerator());
 		table.addGeneratedColumn(PROJECTS, new ProjectsColumnGenerator());
 		
 	}
-	
+
+	/**
+	 * Estalece las cabeceras de las columnas de la tabla de proyectos
+	 * históricos.
+	 */
 	private void setTableColumnHeaders() {
 		table.setColumnHeader(PROJECTS, "Título");
 		table.setColumnHeader(TUTORS, "Tutor/es");
@@ -562,6 +730,10 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		table.setColumnHeader(SCORE, "Nota");
 	}
 
+	/**
+	 * Establece los ratios de expansión de las columnas de la tabla de
+	 * proyectos históricos.
+	 */
 	private void setColumnExpandRatios() {
 		table.setColumnExpandRatio(PROJECTS, 35);
 		table.setColumnExpandRatio(TUTORS, 9);
@@ -571,6 +743,10 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		table.setColumnExpandRatio(SCORE, 3);
 	}
 
+	/**
+	 * Activa el mostrar la información de un proyecto al hacer click sobre él
+	 * en la tabla.
+	 */
 	private void showDescriptionOnClick() {
 		table.setSelectable(true);
 		table.setMultiSelect(false);
@@ -579,9 +755,18 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		table.addValueChangeListener(new TableValueChangeListener());
 	}
 
+	/**
+	 * Listener para mostrar la información de un proyecto al hacer click sobre
+	 * él.
+	 * 
+	 * @author Javier de la Fuente Barrios
+	 */
 	private class TableValueChangeListener implements Property.ValueChangeListener {
 		private static final long serialVersionUID = -5055796506090094836L;
 
+		/**
+		 * Acción a realizar al recibir el evento.
+		 */
 		@Override
 		public void valueChange(ValueChangeEvent event) {
 			if (event.getProperty().getValue() != null) {
@@ -602,13 +787,19 @@ public class HistoricProjectsView extends VerticalLayout implements View {
 		}
 	}
 
+	/**
+	 * Añade los listeners de los filtros a los campos de texto.
+	 */
 	private void addFiltersListeners() {
 		projectFilter.addTextChangeListener(new SimpleStringFilterListener(table, TITLE));
 		tutorsFilter.addTextChangeListener(new OrSimpleStringFilterListener(table, TUTOR1, TUTOR2, TUTOR3));
 		assignmentDateFilter.addTextChangeListener(new SimpleStringFilterListener(table, ASSIGNMENT_DATE));
 		presentationDateFilter.addTextChangeListener(new SimpleStringFilterListener(table, PRESENTATION_DATE));
 	}
-
+	
+	/**
+	 * La vista se inicializa en el constructor.
+	 */
 	@Override
 	public void enter(ViewChangeEvent event) {
 		// Se inicializa el contenido de la vista en el constructor

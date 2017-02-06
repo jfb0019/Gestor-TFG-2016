@@ -60,4 +60,8 @@
 	.v-table-cell-wrapper {   
   		white-space: normal;
   	}  
+  	
+  	.v-table [class*="-row"].v-selected {
+		background: rgba(29, 105, 180, 0.5);
+	}
 }
