@@ -160,7 +160,8 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 			Number totalFreeProjectNumber = fachadaDatos.getTotalFreeProject();
 			Label totalFreeProject = new Label(
 					"- Número total de proyectos sin asignar: " + totalFreeProjectNumber.intValue());
-
+			Label aalumnos = new Label("Buscar la cadena 'Aalumnos sin asignar' en columna Alumnos.");
+			
 			Number totalStudentNumber = fachadaDatos.getTotalNumber(APELLIDOS_NOMBRE, ALUMNO);
 			Label totalStudent = new Label("- Número total de alumnos: " + totalStudentNumber.intValue());
 
@@ -168,7 +169,7 @@ public class ActiveProjectsView extends VerticalLayout implements View {
 			Number totalTutorNumber = fachadaDatos.getTotalNumber(tutorColumnNames, PROYECTO);
 			Label totalTutor = new Label("- Número total de tutores involucrados: " + totalTutorNumber.intValue());
 
-			addComponents(totalProjects, totalFreeProject, totalStudent, totalTutor);
+			addComponents(totalProjects, totalFreeProject, aalumnos, totalStudent, totalTutor);
 		} catch (SQLException e) {
 			LOGGER.error("Error en estadísticas", e);
 		}

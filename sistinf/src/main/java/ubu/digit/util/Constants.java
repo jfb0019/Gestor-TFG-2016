@@ -95,7 +95,7 @@ public final class Constants {
 	/**
 	 * Nombre y apellidos (csv).
 	 */
-	public static final String APELLIDOS_NOMBRE = "apellidosNombre";
+	public static final String APELLIDOS_NOMBRE = "ApellidosNombre";
 
 	/**
 	 * Curso de asignación (csv).
