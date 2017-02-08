@@ -45,7 +45,7 @@ public final class Constants {
 	/**
 	 * Alumno (csv).
 	 */
-	public static final String ALUMNO = "alumno";
+	public static final String ALUMNO = "Alumno";
 
 	/**
 	 * Título (csv).
