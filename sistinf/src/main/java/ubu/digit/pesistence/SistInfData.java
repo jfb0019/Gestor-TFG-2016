@@ -161,6 +161,8 @@ public class SistInfData implements Serializable {
 			}
 			Properties props = new java.util.Properties();
 			props.put("charset", "UTF-8");
+			props.put("ignoreNonParseableLines", true);
+			props.put("separator", ";");
 			con = DriverManager.getConnection(url + serverPath + DIRCSV, props);
 		} catch (ClassNotFoundException | SQLException e) {
 			LOGGER.error(e);
