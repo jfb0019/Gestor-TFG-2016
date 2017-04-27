@@ -126,7 +126,7 @@ public class SistInfData implements Serializable {
 	 * Directorio donde se encuentra los datos de entrada, es decir, los
 	 * ficheros que contienen los datos que vamos a consultar.
 	 */
-	private static final String DIRCSV = prop.getSetting("dataIn");
+	public static final String DIRCSV = prop.getSetting("dataIn");
 
 	/**
 	 * Constructor vacío.
@@ -159,6 +159,9 @@ public class SistInfData implements Serializable {
 			if (DIRCSV.startsWith("/")) {
 				serverPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 			}
+			
+			new BOMRemoveUTF().bomRemoveUTFDirectory(serverPath + DIRCSV);
+			
 			Properties props = new java.util.Properties();
 			props.put("ignoreNonParseableLines", true);
 			props.put("separator", ";");
