@@ -133,6 +133,7 @@ public class SistInfData implements Serializable {
 	 */
 	private SistInfData() {
 		super();
+		
 		this.connection = this.getConection(URL);
 	}
 
@@ -159,10 +160,15 @@ public class SistInfData implements Serializable {
 			if (DIRCSV.startsWith("/")) {
 				serverPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 			}
+			
+			new BOMRemoveUTF().bomRemoveUTFDirectory(serverPath + DIRCSV);
+			
 			Properties props = new java.util.Properties();
 			props.put("ignoreNonParseableLines", true);
 			props.put("separator", ";");
 			props.put("charset", "UTF-8");
+			props.put("ignoreNonParseableLines", true);
+			props.put("separator", ";");
 			con = DriverManager.getConnection(url + serverPath + DIRCSV, props);
 		} catch (ClassNotFoundException | SQLException e) {
 			LOGGER.error(e);
