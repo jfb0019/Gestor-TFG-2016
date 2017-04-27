@@ -160,6 +160,8 @@ public class SistInfData implements Serializable {
 				serverPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 			}
 			Properties props = new java.util.Properties();
+			props.put("ignoreNonParseableLines", true);
+			props.put("separator", ";");
 			props.put("charset", "UTF-8");
 			con = DriverManager.getConnection(url + serverPath + DIRCSV, props);
 		} catch (ClassNotFoundException | SQLException e) {
